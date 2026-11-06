@@ -48,9 +48,9 @@ fun QuoteRow(
             )
         }
         Column(Modifier.weight(1f)) {
-            Text(item.company.name, style = MaterialTheme.typography.titleMedium)
+            Text(item.company.symbol, style = MaterialTheme.typography.titleMedium)
             Text(
-                item.company.symbol,
+                item.company.name,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
