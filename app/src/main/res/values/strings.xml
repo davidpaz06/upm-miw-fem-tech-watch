@@ -30,6 +30,8 @@
     <string name="stats_total_change">Variación total</string>
     <string name="stats_count">Consultas guardadas</string>
 
+    <string name="profile_market_cap">Capitalización: %1$s</string>
+
     <string name="stats_title">Estadísticas</string>
     <string name="stats_sector_hint">Media de la variación acumulada de cada empresa del sector, según tus consultas guardadas.</string>
     <string name="stats_companies_with_data">%1$d de %2$d empresas con datos</string>
