@@ -2,7 +2,9 @@ package com.example.project_auth.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.project_auth.data.FirestoreRepository
 import com.example.project_auth.data.StockRepository
+import com.example.project_auth.data.toSnapshot
 import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
 import com.example.project_auth.domain.Company
@@ -28,6 +30,7 @@ data class HomeUiState(
 
 class HomeViewModel(
     private val repository: StockRepository = StockRepository(),
+    private val firestore: FirestoreRepository = FirestoreRepository(),
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
@@ -62,6 +65,13 @@ class HomeViewModel(
                     loaded = true,
                 )
             }
+            saveSnapshots(quotes)
         }
+    }
+
+    /** Runs on its own scope so a slow or failing write never blocks the quote list. */
+    private fun saveSnapshots(quotes: Map<String, Result<Quote>>) {
+        val snapshots = quotes.mapNotNull { (symbol, result) -> result.getOrNull()?.toSnapshot(symbol) }
+        viewModelScope.launch { firestore.saveSnapshots(snapshots) }
     }
 }
