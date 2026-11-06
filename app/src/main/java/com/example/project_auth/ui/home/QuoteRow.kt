@@ -1,5 +1,6 @@
 package com.example.project_auth.ui.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,9 +17,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.project_auth.R
+import com.example.project_auth.ui.theme.changeColor
 
-private val Gain = Color(0xFF2E7D32)
-private val Loss = Color(0xFFC62828)
 private val Star = Color(0xFFF9A825)
 
 @Composable
@@ -26,11 +26,13 @@ fun QuoteRow(
     item: CompanyQuote,
     isFavourite: Boolean,
     onToggleFavourite: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(onClick = onClick)
             .padding(start = 4.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -69,7 +71,7 @@ fun QuoteRow(
                 Text(
                     "%+.2f%%".format(percent),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (percent >= 0) Gain else Loss,
+                    color = changeColor(percent),
                 )
             }
         }

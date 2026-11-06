@@ -31,6 +31,25 @@ class FirestoreRepository(
         batch.commit().await()
     }
 
+    /**
+     * Filters by symbol only and sorts here, because combining a filter and an order
+     * on different fields would need a composite index in Firestore.
+     */
+    suspend fun getSnapshots(symbol: String): Result<List<QuoteSnapshot>> = runCatching {
+        userDocument().collection(QUOTES)
+            .whereEqualTo("symbol", symbol)
+            .get().await()
+            .toObjects(QuoteSnapshot::class.java)
+            .sortedBy { it.timestamp }
+    }
+
+    suspend fun getAllSnapshots(): Result<List<QuoteSnapshot>> = runCatching {
+        userDocument().collection(QUOTES)
+            .get().await()
+            .toObjects(QuoteSnapshot::class.java)
+            .sortedBy { it.timestamp }
+    }
+
     /** Emits the favourite symbols now and again after every change. */
     fun watchlistSymbols(): Flow<Set<String>> = callbackFlow {
         val registration = userDocument().collection(WATCHLIST)

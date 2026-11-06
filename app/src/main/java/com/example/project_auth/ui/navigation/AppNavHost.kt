@@ -4,12 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.project_auth.data.AuthRepository
 import com.example.project_auth.ui.auth.LoginScreen
 import com.example.project_auth.ui.auth.RegisterScreen
+import com.example.project_auth.ui.history.HistoryScreen
 import com.example.project_auth.ui.home.HomeScreen
 import com.example.project_auth.ui.watchlist.WatchlistScreen
 
@@ -18,6 +21,9 @@ object Routes {
     const val REGISTER = "register"
     const val HOME = "home"
     const val WATCHLIST = "watchlist"
+    const val HISTORY = "history/{symbol}"
+
+    fun history(symbol: String) = "history/$symbol"
 }
 
 @Composable
@@ -45,10 +51,25 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             RegisterScreen(onGoToLogin = { navController.popBackStack() })
         }
         composable(Routes.HOME) {
-            HomeScreen(onOpenWatchlist = { navController.navigate(Routes.WATCHLIST) })
+            HomeScreen(
+                onOpenWatchlist = { navController.navigate(Routes.WATCHLIST) },
+                onOpenHistory = { navController.navigate(Routes.history(it)) },
+            )
         }
         composable(Routes.WATCHLIST) {
-            WatchlistScreen(onBack = { navController.popBackStack() })
+            WatchlistScreen(
+                onBack = { navController.popBackStack() },
+                onOpenHistory = { navController.navigate(Routes.history(it)) },
+            )
+        }
+        composable(
+            route = Routes.HISTORY,
+            arguments = listOf(navArgument("symbol") { type = NavType.StringType }),
+        ) { entry ->
+            HistoryScreen(
+                symbol = entry.arguments?.getString("symbol").orEmpty(),
+                onBack = { navController.popBackStack() },
+            )
         }
     }
 }

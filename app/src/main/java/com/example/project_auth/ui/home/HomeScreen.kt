@@ -33,6 +33,7 @@ import com.example.project_auth.domain.Sector
 @Composable
 fun HomeScreen(
     onOpenWatchlist: () -> Unit,
+    onOpenHistory: (String) -> Unit,
     modifier: Modifier = Modifier,
     authRepository: AuthRepository = AuthRepository(),
     viewModel: HomeViewModel = viewModel(),
@@ -102,6 +103,7 @@ fun HomeScreen(
                             item = item,
                             isFavourite = item.company.symbol in state.watchlist,
                             onToggleFavourite = { viewModel.toggleWatchlist(item.company.symbol) },
+                            onClick = { onOpenHistory(item.company.symbol) },
                         )
                         HorizontalDivider()
                     }

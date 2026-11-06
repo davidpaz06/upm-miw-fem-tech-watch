@@ -24,6 +24,9 @@
     <string name="watchlist_empty">Aún no tienes favoritos. Marca con ☆ las empresas que quieras seguir.</string>
     <string name="back">Volver</string>
 
+    <string name="history_error">No se pudo cargar el historial</string>
+    <string name="history_empty">Aún no hay consultas guardadas de esta empresa. Vuelve a cargar su sector para registrar un precio.</string>
+
     <string name="auth_error_invalid_email">Introduce un correo electrónico válido</string>
     <string name="auth_error_short_password">La contraseña debe tener al menos 6 caracteres</string>
     <string name="auth_error_password_mismatch">Las contraseñas no coinciden</string>

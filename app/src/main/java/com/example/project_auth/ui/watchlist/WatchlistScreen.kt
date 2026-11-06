@@ -29,6 +29,7 @@ import com.example.project_auth.ui.home.QuoteRow
 @Composable
 fun WatchlistScreen(
     onBack: () -> Unit,
+    onOpenHistory: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WatchlistViewModel = viewModel(),
 ) {
@@ -77,6 +78,7 @@ fun WatchlistScreen(
                             item = item,
                             isFavourite = true,
                             onToggleFavourite = { viewModel.remove(item.company.symbol) },
+                            onClick = { onOpenHistory(item.company.symbol) },
                         )
                         HorizontalDivider()
                     }
