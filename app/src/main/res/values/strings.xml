@@ -10,6 +10,10 @@
     <string name="auth_go_to_login">¿Ya tienes cuenta? Inicia sesión</string>
     <string name="auth_logout">Cerrar sesión</string>
 
+    <string name="sector_cloud">Cloud</string>
+    <string name="sector_ai">IA</string>
+    <string name="sector_consulting">Consultoría</string>
+
     <string name="auth_error_invalid_email">Introduce un correo electrónico válido</string>
     <string name="auth_error_short_password">La contraseña debe tener al menos 6 caracteres</string>
     <string name="auth_error_password_mismatch">Las contraseñas no coinciden</string>
