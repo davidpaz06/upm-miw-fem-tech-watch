@@ -31,6 +31,10 @@
     <string name="stats_count">Consultas guardadas</string>
 
     <string name="profile_market_cap">Capitalización: %1$s</string>
+    <!-- Spanish long scale: 1 billón = 10^12. Values arrive in millions of dollars. -->
+    <string name="market_cap_trillions">%1$.2f billones $</string>
+    <string name="market_cap_billions">%1$.1f mil millones $</string>
+    <string name="market_cap_millions">%1$.0f millones $</string>
 
     <string name="stats_title">Estadísticas</string>
     <string name="stats_sector_hint">Media de la variación acumulada de cada empresa del sector, según tus consultas guardadas.</string>

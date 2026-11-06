@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.project_auth.R
@@ -48,10 +50,12 @@ fun RegisterScreen(
         EmailField(email, { email = it }, Modifier.fillMaxWidth())
         PasswordField(password, { password = it }, R.string.auth_password, Modifier.fillMaxWidth())
         PasswordField(
-            confirmation,
-            { confirmation = it },
-            R.string.auth_confirm_password,
-            Modifier.fillMaxWidth(),
+            value = confirmation,
+            onValueChange = { confirmation = it },
+            label = R.string.auth_confirm_password,
+            modifier = Modifier.fillMaxWidth(),
+            imeAction = ImeAction.Done,
+            onDone = { viewModel.register(email, password, confirmation) },
         )
         ErrorText(state.error)
         Button(
@@ -60,7 +64,7 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxWidth(),
         ) {
             if (state.loading) {
-                CircularProgressIndicator(Modifier.padding(2.dp))
+                CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
             } else {
                 Text(stringResource(R.string.auth_register))
             }

@@ -50,8 +50,9 @@ fun CompanyProfileHeader(profile: CompanyProfile, modifier: Modifier = Modifier)
 }
 
 /** Finnhub reports market capitalization in millions of dollars. */
-internal fun formatMarketCap(millions: Double): String = when {
-    millions >= 1_000_000 -> "%.2f billones $".format(millions / 1_000_000)
-    millions >= 1_000 -> "%.1f mil millones $".format(millions / 1_000)
-    else -> "%.0f millones $".format(millions)
+@Composable
+private fun formatMarketCap(millions: Double): String = when {
+    millions >= 1_000_000 -> stringResource(R.string.market_cap_trillions, millions / 1_000_000)
+    millions >= 1_000 -> stringResource(R.string.market_cap_billions, millions / 1_000)
+    else -> stringResource(R.string.market_cap_millions, millions)
 }
