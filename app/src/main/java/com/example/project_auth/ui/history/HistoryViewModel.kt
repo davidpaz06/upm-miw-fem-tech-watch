@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.project_auth.data.FirestoreRepository
 import com.example.project_auth.data.QuoteSnapshot
+import com.example.project_auth.domain.PriceStats
+import com.example.project_auth.domain.toPriceStats
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +16,9 @@ data class HistoryUiState(
     val snapshots: List<QuoteSnapshot> = emptyList(),
     val loading: Boolean = true,
     val failed: Boolean = false,
-)
+) {
+    val stats: PriceStats? get() = snapshots.toPriceStats()
+}
 
 class HistoryViewModel(
     private val symbol: String,
