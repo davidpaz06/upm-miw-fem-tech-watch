@@ -80,6 +80,13 @@ fun HistoryScreen(
             state.snapshots.isEmpty() -> CenteredBox { Text(stringResource(R.string.history_empty)) }
 
             else -> LazyColumn(Modifier.fillMaxSize()) {
+                item {
+                    PriceChart(
+                        prices = state.snapshots.map { it.price },
+                        modifier = Modifier.padding(16.dp),
+                    )
+                    HorizontalDivider()
+                }
                 items(state.snapshots.asReversed(), key = { it.timestamp }) { snapshot ->
                     SnapshotRow(snapshot)
                     HorizontalDivider()
