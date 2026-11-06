@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.project_auth.R
+import com.example.project_auth.ui.common.CompanyLogo
 import com.example.project_auth.ui.theme.changeColor
 
 private val Star = Color(0xFFF9A825)
@@ -49,7 +50,8 @@ fun QuoteRow(
                 color = if (isFavourite) Star else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Column(Modifier.weight(1f)) {
+        CompanyLogo(item.company.symbol)
+        Column(Modifier.weight(1f).padding(start = 12.dp)) {
             Text(item.company.symbol, style = MaterialTheme.typography.titleMedium)
             Text(
                 item.company.name,
