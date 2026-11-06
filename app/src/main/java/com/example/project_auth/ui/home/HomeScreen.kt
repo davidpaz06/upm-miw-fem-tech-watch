@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -59,10 +60,16 @@ fun HomeScreen(
                 )
             }
         }
-        LazyColumn(Modifier.fillMaxSize()) {
-            items(state.items, key = { it.company.symbol }) { item ->
-                QuoteRow(item)
-                HorizontalDivider()
+        PullToRefreshBox(
+            isRefreshing = state.loading,
+            onRefresh = viewModel::refresh,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            LazyColumn(Modifier.fillMaxSize()) {
+                items(state.items, key = { it.company.symbol }) { item ->
+                    QuoteRow(item)
+                    HorizontalDivider()
+                }
             }
         }
     }
