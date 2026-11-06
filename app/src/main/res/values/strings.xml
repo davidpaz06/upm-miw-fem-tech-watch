@@ -15,6 +15,8 @@
     <string name="sector_consulting">Consultoría</string>
 
     <string name="quote_unavailable">No disponible</string>
+    <string name="home_error">No se pudieron cargar las cotizaciones. Revisa tu conexión y tu clave de Finnhub.</string>
+    <string name="home_retry">Reintentar</string>
 
     <string name="auth_error_invalid_email">Introduce un correo electrónico válido</string>
     <string name="auth_error_short_password">La contraseña debe tener al menos 6 caracteres</string>
