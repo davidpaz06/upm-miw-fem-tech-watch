@@ -13,6 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -24,6 +25,7 @@ data class HomeUiState(
     val items: List<CompanyQuote> = emptyList(),
     val loading: Boolean = false,
     val loaded: Boolean = false,
+    val watchlist: Set<String> = emptySet(),
 ) {
     val failed: Boolean get() = loaded && items.none { it.quote != null }
 }
@@ -40,12 +42,27 @@ class HomeViewModel(
 
     init {
         load()
+        viewModelScope.launch {
+            firestore.watchlistSymbols()
+                .catch { emit(emptySet()) }
+                .collect { symbols -> _state.update { it.copy(watchlist = symbols) } }
+        }
     }
 
     fun selectSector(sector: Sector) {
         if (sector == _state.value.sector) return
-        _state.value = HomeUiState(sector = sector)
+        _state.update { it.copy(sector = sector, items = emptyList(), loading = false, loaded = false) }
         load()
+    }
+
+    fun toggleWatchlist(symbol: String) {
+        viewModelScope.launch {
+            if (symbol in _state.value.watchlist) {
+                firestore.removeFromWatchlist(symbol)
+            } else {
+                firestore.addToWatchlist(symbol)
+            }
+        }
     }
 
     fun refresh() = load()

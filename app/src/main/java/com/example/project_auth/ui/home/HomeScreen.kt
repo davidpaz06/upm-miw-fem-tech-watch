@@ -92,7 +92,11 @@ fun HomeScreen(
 
                 else -> LazyColumn(Modifier.fillMaxSize()) {
                     items(state.items, key = { it.company.symbol }) { item ->
-                        QuoteRow(item)
+                        QuoteRow(
+                            item = item,
+                            isFavourite = item.company.symbol in state.watchlist,
+                            onToggleFavourite = { viewModel.toggleWatchlist(item.company.symbol) },
+                        )
                         HorizontalDivider()
                     }
                 }

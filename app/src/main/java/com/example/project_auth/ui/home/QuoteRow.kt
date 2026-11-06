@@ -1,10 +1,10 @@
 package com.example.project_auth.ui.home
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,22 +12,42 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.project_auth.R
 
 private val Gain = Color(0xFF2E7D32)
 private val Loss = Color(0xFFC62828)
+private val Star = Color(0xFFF9A825)
 
 @Composable
-fun QuoteRow(item: CompanyQuote, modifier: Modifier = Modifier) {
+fun QuoteRow(
+    item: CompanyQuote,
+    isFavourite: Boolean,
+    onToggleFavourite: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(start = 4.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column {
+        val description = stringResource(
+            if (isFavourite) R.string.watchlist_remove else R.string.watchlist_add,
+        )
+        IconButton(
+            onClick = onToggleFavourite,
+            modifier = Modifier.semantics { contentDescription = description },
+        ) {
+            Text(
+                text = if (isFavourite) "★" else "☆",
+                style = MaterialTheme.typography.titleLarge,
+                color = if (isFavourite) Star else MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Column(Modifier.weight(1f)) {
             Text(item.company.name, style = MaterialTheme.typography.titleMedium)
             Text(
                 item.company.symbol,
