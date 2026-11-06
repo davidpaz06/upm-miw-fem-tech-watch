@@ -67,7 +67,7 @@ fun HistoryScreen(
                 }
             }
         }
-        state.profile?.let { CompanyProfileHeader(it) }
+        state.profile?.let { CompanyProfileHeader(symbol, it) }
         when {
             state.loading -> CenteredBox { CircularProgressIndicator() }
 
