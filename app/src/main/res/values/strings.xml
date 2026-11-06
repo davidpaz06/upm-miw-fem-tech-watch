@@ -20,6 +20,9 @@
 
     <string name="watchlist_add">Añadir a favoritos</string>
     <string name="watchlist_remove">Quitar de favoritos</string>
+    <string name="watchlist_title">Favoritos</string>
+    <string name="watchlist_empty">Aún no tienes favoritos. Marca con ☆ las empresas que quieras seguir.</string>
+    <string name="back">Volver</string>
 
     <string name="auth_error_invalid_email">Introduce un correo electrónico válido</string>
     <string name="auth_error_short_password">La contraseña debe tener al menos 6 caracteres</string>

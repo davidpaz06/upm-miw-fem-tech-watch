@@ -32,6 +32,7 @@ import com.example.project_auth.domain.Sector
 
 @Composable
 fun HomeScreen(
+    onOpenWatchlist: () -> Unit,
     modifier: Modifier = Modifier,
     authRepository: AuthRepository = AuthRepository(),
     viewModel: HomeViewModel = viewModel(),
@@ -50,8 +51,13 @@ fun HomeScreen(
                 authRepository.currentUser?.email.orEmpty(),
                 style = MaterialTheme.typography.bodyMedium,
             )
-            TextButton(onClick = authRepository::signOut) {
-                Text(stringResource(R.string.auth_logout))
+            Row {
+                TextButton(onClick = onOpenWatchlist) {
+                    Text(stringResource(R.string.watchlist_title))
+                }
+                TextButton(onClick = authRepository::signOut) {
+                    Text(stringResource(R.string.auth_logout))
+                }
             }
         }
         PrimaryTabRow(selectedTabIndex = Sector.entries.indexOf(state.sector)) {

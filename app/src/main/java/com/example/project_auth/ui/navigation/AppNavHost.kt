@@ -11,11 +11,13 @@ import com.example.project_auth.data.AuthRepository
 import com.example.project_auth.ui.auth.LoginScreen
 import com.example.project_auth.ui.auth.RegisterScreen
 import com.example.project_auth.ui.home.HomeScreen
+import com.example.project_auth.ui.watchlist.WatchlistScreen
 
 object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val HOME = "home"
+    const val WATCHLIST = "watchlist"
 }
 
 @Composable
@@ -43,7 +45,10 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             RegisterScreen(onGoToLogin = { navController.popBackStack() })
         }
         composable(Routes.HOME) {
-            HomeScreen()
+            HomeScreen(onOpenWatchlist = { navController.navigate(Routes.WATCHLIST) })
+        }
+        composable(Routes.WATCHLIST) {
+            WatchlistScreen(onBack = { navController.popBackStack() })
         }
     }
 }
