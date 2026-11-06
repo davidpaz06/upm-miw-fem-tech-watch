@@ -14,6 +14,7 @@ import com.example.project_auth.ui.auth.LoginScreen
 import com.example.project_auth.ui.auth.RegisterScreen
 import com.example.project_auth.ui.history.HistoryScreen
 import com.example.project_auth.ui.home.HomeScreen
+import com.example.project_auth.ui.stats.StatsScreen
 import com.example.project_auth.ui.watchlist.WatchlistScreen
 
 object Routes {
@@ -21,6 +22,7 @@ object Routes {
     const val REGISTER = "register"
     const val HOME = "home"
     const val WATCHLIST = "watchlist"
+    const val STATS = "stats"
     const val HISTORY = "history/{symbol}"
 
     fun history(symbol: String) = "history/$symbol"
@@ -53,8 +55,12 @@ fun AppNavHost(modifier: Modifier = Modifier) {
         composable(Routes.HOME) {
             HomeScreen(
                 onOpenWatchlist = { navController.navigate(Routes.WATCHLIST) },
+                onOpenStats = { navController.navigate(Routes.STATS) },
                 onOpenHistory = { navController.navigate(Routes.history(it)) },
             )
+        }
+        composable(Routes.STATS) {
+            StatsScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.WATCHLIST) {
             WatchlistScreen(

@@ -30,6 +30,11 @@
     <string name="stats_total_change">Variación total</string>
     <string name="stats_count">Consultas guardadas</string>
 
+    <string name="stats_title">Estadísticas</string>
+    <string name="stats_sector_hint">Media de la variación acumulada de cada empresa del sector, según tus consultas guardadas.</string>
+    <string name="stats_companies_with_data">%1$d de %2$d empresas con datos</string>
+    <string name="stats_not_enough_data">Sin datos suficientes</string>
+
     <string name="history_error">No se pudo cargar el historial</string>
     <string name="history_empty">Aún no hay consultas guardadas de esta empresa. Vuelve a cargar su sector para registrar un precio.</string>
 

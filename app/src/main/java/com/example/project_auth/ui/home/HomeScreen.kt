@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.project_auth.R
@@ -33,6 +34,7 @@ import com.example.project_auth.domain.Sector
 @Composable
 fun HomeScreen(
     onOpenWatchlist: () -> Unit,
+    onOpenStats: () -> Unit,
     onOpenHistory: (String) -> Unit,
     modifier: Modifier = Modifier,
     authRepository: AuthRepository = AuthRepository(),
@@ -51,14 +53,20 @@ fun HomeScreen(
             Text(
                 authRepository.currentUser?.email.orEmpty(),
                 style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
             )
-            Row {
-                TextButton(onClick = onOpenWatchlist) {
-                    Text(stringResource(R.string.watchlist_title))
-                }
-                TextButton(onClick = authRepository::signOut) {
-                    Text(stringResource(R.string.auth_logout))
-                }
+            TextButton(onClick = authRepository::signOut) {
+                Text(stringResource(R.string.auth_logout))
+            }
+        }
+        Row(Modifier.padding(horizontal = 8.dp)) {
+            TextButton(onClick = onOpenWatchlist) {
+                Text(stringResource(R.string.watchlist_title))
+            }
+            TextButton(onClick = onOpenStats) {
+                Text(stringResource(R.string.stats_title))
             }
         }
         PrimaryTabRow(selectedTabIndex = Sector.entries.indexOf(state.sector)) {
