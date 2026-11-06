@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -22,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.project_auth.R
 import com.example.project_auth.data.AuthRepository
+import com.example.project_auth.domain.Sector
 
 @Composable
 fun HomeScreen(
@@ -45,6 +48,15 @@ fun HomeScreen(
             )
             TextButton(onClick = authRepository::signOut) {
                 Text(stringResource(R.string.auth_logout))
+            }
+        }
+        PrimaryTabRow(selectedTabIndex = Sector.entries.indexOf(state.sector)) {
+            Sector.entries.forEach { sector ->
+                Tab(
+                    selected = sector == state.sector,
+                    onClick = { viewModel.selectSector(sector) },
+                    text = { Text(stringResource(sector.label)) },
+                )
             }
         }
         LazyColumn(Modifier.fillMaxSize()) {
