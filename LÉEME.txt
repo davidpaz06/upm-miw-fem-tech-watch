@@ -41,6 +41,11 @@ una gráfica, estadísticas y una comparación entre sectores.
     español.
   - Panel de cotizaciones por sector (pestañas Cloud / IA / Consultoría), con
     precio y variación diaria en verde o rojo. Se recarga deslizando hacia abajo.
+  - Logos: cada empresa muestra su logo en el listado y en el detalle. Se
+    descarga una sola vez, la primera vez que se necesita, y se guarda en el
+    almacenamiento interno de la aplicación (carpeta files/logos); las siguientes
+    veces se lee del disco sin conexión. Mientras no está disponible se muestra
+    la inicial del símbolo.
   - Favoritos: la estrella de cada fila añade o quita la empresa de la lista del
     usuario, que se sincroniza con Firestore.
   - Historial por empresa: al tocar una fila se abre su detalle con logo y perfil
@@ -120,7 +125,7 @@ una gráfica, estadísticas y una comparación entre sectores.
     users/{uid}/watchlist/{SÍMBOLO}       favoritos
 
   Librerías: Navigation Compose, Retrofit + Gson, OkHttp (logging), Firebase Auth
-  y Firestore, Coil (logos de empresas).
+  y Firestore, Coil (mostrar los logos guardados).
 
   Pruebas unitarias (app/src/test): cálculo de estadísticas y comparación de
   sectores.  Se ejecutan con:  ./gradlew testDebugUnitTest
