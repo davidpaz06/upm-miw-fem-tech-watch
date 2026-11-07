@@ -85,7 +85,7 @@ fun StockDetailModal(symbol: String?, onDismiss: () -> Unit, modifier: Modifier 
             ) {
                 HistoryScreen(
                     symbol = symbol ?: lastSymbol,
-                    onBack = onDismiss,
+                    onClose = onDismiss,
                     modifier = Modifier.navigationBarsPadding(),
                 )
             }

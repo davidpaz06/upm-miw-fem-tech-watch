@@ -15,7 +15,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,6 +31,7 @@ import com.example.project_auth.R
 import com.example.project_auth.data.QuoteSnapshot
 import com.example.project_auth.domain.Companies
 import com.example.project_auth.domain.PriceStats
+import com.example.project_auth.ui.common.RoundIconButton
 import com.example.project_auth.ui.theme.changeColor
 import java.text.DateFormat
 import java.util.Date
@@ -39,7 +39,7 @@ import java.util.Date
 @Composable
 fun HistoryScreen(
     symbol: String,
-    onBack: () -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HistoryViewModel = viewModel(
         key = symbol,
@@ -53,12 +53,11 @@ fun HistoryScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = 16.dp),
+                .padding(start = 20.dp, end = 12.dp, top = 12.dp, bottom = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
-            Column {
+            Column(Modifier.weight(1f)) {
                 Text(symbol, style = MaterialTheme.typography.titleLarge)
                 Companies.find(symbol)?.let {
                     Text(
@@ -68,6 +67,11 @@ fun HistoryScreen(
                     )
                 }
             }
+            RoundIconButton(
+                icon = R.drawable.ic_close,
+                description = stringResource(R.string.detail_close),
+                onClick = onClose,
+            )
         }
         state.profile?.let { CompanyProfileHeader(symbol, it) }
         when {
