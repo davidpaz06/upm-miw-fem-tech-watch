@@ -21,5 +21,8 @@ data class CompanyProfile(
     @SerializedName("logo") val logo: String?,
     @SerializedName("exchange") val exchange: String?,
     @SerializedName("finnhubIndustry") val industry: String?,
+    /** In millions. The currency is not always the one in [currency]; see tradingCurrency(). */
     @SerializedName("marketCapitalization") val marketCap: Double?,
+    /** Reporting currency of the company, which is not necessarily the one it trades in. */
+    @SerializedName("currency") val currency: String?,
 )
