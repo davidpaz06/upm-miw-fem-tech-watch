@@ -33,39 +33,51 @@ una gráfica, estadísticas y una comparación entre sectores.
   Autenticación   Firebase Authentication con email y contraseña. Se han hecho
                   pantallas propias de login y registro en Jetpack Compose con el
                   SDK de Firebase Auth, en lugar de FirebaseUI (que está basado en
-                  vistas XML). La sesión se mantiene entre ejecuciones.
+                  vistas XML y no encaja en una aplicación solo Compose). Registro,
+                  inicio y cierre de sesión; la sesión se mantiene entre
+                  ejecuciones; errores en español (email no válido, contraseña
+                  corta, credenciales incorrectas, email ya registrado, sin red).
 
-  Servicio web    API REST de Finnhub (https://finnhub.io), consumida con Retrofit
-                  y OkHttp:
-                    GET /quote            precio actual, variación, máximo, mínimo
-                    GET /stock/profile2   nombre, logo, bolsa, industria, capitalización
+  Servicio web    Retrofit + OkHttp + Gson, con tres servicios externos:
+                    Finnhub (https://finnhub.io), con clave:
+                      GET /quote           precio actual, variación, máximo, mínimo
+                      GET /stock/profile2  nombre, logo, bolsa, capitalización
+                    Yahoo Finance (gráficos, sin clave, no oficial): cierres
+                      diarios, las últimas 50 entradas de cada empresa.
+                    open.er-api.com (sin clave): tipos de cambio respecto al
+                      dólar, para convertir la capitalización. Datos de Exchange
+                      Rate API (https://www.exchangerate-api.com).
+                  Finnhub no ofrece velas históricas en el plan gratuito, por eso
+                  el histórico se pide a Yahoo. Un limitador propio espacia las
+                  llamadas a Finnhub (máximo 50 por minuto).
 
-  Histórico       Finnhub no ofrece velas históricas en el plan gratuito, así que
-                  los precios pasados se piden a la API de gráficos de Yahoo
-                  Finance (sin clave, no oficial): cierres diarios, las últimas
-                  50 entradas. Al abrir el detalle de una empresa se consulta,
-                  se dibuja la gráfica con esa respuesta y después se actualiza
-                  Firestore con los días que faltan.
+  Persistencia    Cloud Firestore, por usuario: historial de cotizaciones (un
+                  documento por empresa y día) y lista de favoritos. Con el
+                  historial se dibujan la gráfica y las estadísticas del detalle y
+                  la comparación entre sectores. Las reglas de seguridad
+                  (firestore.rules) impiden que un usuario lea o escriba datos de
+                  otro. Adicionalmente hay persistencia local: última cotización
+                  de cada empresa (SharedPreferences) y logos (almacenamiento
+                  interno).
 
-  Tipos de cambio API de open.er-api.com (sin clave): tipos respecto al dólar,
-                  para convertir la capitalización. Datos de Exchange Rate API
-                  (https://www.exchangerate-api.com).
+  Utilidad        Seguimiento de 80 empresas tecnológicas en cuatro sectores, con
+  y complejidad   ordenación, favoritos, detalle con gráfica y estadísticas,
+                  comparación entre sectores, conversión de moneda, modo oscuro y
+                  uso sin conexión (ver apartado 3).
 
-  Persistencia    Cloud Firestore. Cada consulta se guarda por usuario, de modo que
-                  el historial y las estadísticas son privados de cada cuenta.
-                  Adicionalmente hay persistencia local: última cotización de cada
-                  empresa (SharedPreferences) y logos (almacenamiento interno).
-                  Las reglas de seguridad (firestore.rules) impiden que un usuario
-                  lea o escriba datos de otro.
+  Documentación   Este fichero, capturas de pantalla (carpeta capturas/) y vídeo
+                  (ver apartado 7).
 
+  Entrega         Un único zip sin .gradle, .idea ni build: ver apartado 9.
 
 3. FUNCIONALIDADES
 ------------------
   - Registro, inicio y cierre de sesión. Validación de email, longitud de la
     contraseña (mínimo 6) y coincidencia al registrarse. Mensajes de error en
     español.
-  - Panel de cotizaciones por sector (pestañas Cloud / IA / Consultoría), con
-    precio y variación diaria en verde o rojo. Se recarga deslizando hacia abajo.
+  - Panel de cotizaciones por sector (pestañas Cloud, IA, Consultoría y
+    Hardware, 20 empresas cada una), con precio y variación diaria en verde o
+    rojo. Se recarga deslizando hacia abajo.
   - Uso sin conexión: la última cotización de cada empresa se guarda también en
     el dispositivo (SharedPreferences). Al abrir la aplicación se muestran
     primero esos datos guardados y después se refrescan; si Finnhub no responde,
@@ -75,9 +87,10 @@ una gráfica, estadísticas y una comparación entre sectores.
     actualizar solo se piden las filas que se ven (10 al abrir un sector, más
     las que no tengan ningún dato guardado); las demás se piden de 10 en 10
     cuando el scroll se acerca a ellas y, mientras tanto, muestran su última
-    cotización guardada. Con la ordenación por precio se piden las 20, porque comparar
-    precios los necesita todos. Una cotización consultada hace menos de un
-    minuto no se vuelve a pedir al cambiar de pestaña ni al volver a Home;
+    cotización guardada. Con la ordenación por precio se piden las 20, porque
+    comparar precios los necesita todos. Una cotización consultada hace menos
+    de un minuto no se vuelve a pedir al cambiar de pestaña ni al volver a
+    Home;
     deslizar para actualizar vuelve a pedir lo que tenga más de 20 segundos.
   - Logos: cada empresa muestra su logo en el listado y en el detalle. Se
     descarga una sola vez, la primera vez que se necesita, y se guarda en el
@@ -107,13 +120,15 @@ una gráfica, estadísticas y una comparación entre sectores.
     moneda, también el importe original y el tipo de cambio usado.
   - Estadísticas: variación media acumulada de cada sector.
 
-  Nota sobre los datos: el historial lo construye la propia aplicación con las
-  consultas que hace el usuario. No se usa el endpoint de velas históricas de
-  Finnhub (restringido en el plan gratuito), así que al principio habrá pocos
-  puntos y la gráfica y los sectores
-  se irán completando al consultar en momentos distintos. Con el mercado cerrado,
-  la cotización no cambia y la misma consulta se sobrescribe en lugar de
-  duplicarse.
+  Nota sobre los datos: el historial de cada empresa se obtiene de dos formas.
+  Al abrir su detalle se piden a Yahoo Finance los últimos 50 cierres diarios,
+  se dibuja la gráfica con esa respuesta y se guardan en Firestore los días que
+  faltan. Además, cada vez que se consulta un sector se guarda la cotización del
+  día de sus empresas; con el mercado cerrado la misma consulta se sobrescribe
+  (un documento por empresa y día) en lugar de duplicarse. La comparación entre
+  sectores usa lo guardado en Firestore, así que se completa a medida que se
+  abren sectores y detalles.
+
 
 
 4. REQUISITOS PARA EJECUTARLA
@@ -162,21 +177,27 @@ una gráfica, estadísticas y una comparación entre sectores.
   dependencias: cada ViewModel crea sus repositorios por defecto.
 
   app/src/main/java/com/example/project_auth/
-    data/            AuthRepository, FirestoreRepository, StockRepository
-      remote/        Retrofit: FinnhubService, FinnhubClient, DTOs
-    domain/          empresas y sectores, estadísticas, comparación de sectores
+    data/            AuthRepository, FirestoreRepository, StockRepository,
+                     PriceHistoryRepository, ExchangeRateRepository,
+                     LogoRepository, QuoteCache, QuoteLoader, ThemeSettings
+      remote/        Retrofit: Finnhub, Yahoo Finance, tipos de cambio, limitador
+    domain/          empresas y sectores, estadísticas, comparación de sectores,
+                     caducidad y tandas de cotizaciones, moneda de cotización
     ui/
       auth/          login y registro
-      home/          panel de cotizaciones
+      home/          panel de cotizaciones y ordenación
       watchlist/     favoritos
       history/       detalle, gráfica e historial de una empresa
       stats/         comparación de sectores
+      settings/      ajustes (cuenta, modo oscuro, cerrar sesión)
+      common/        componentes compartidos (píldoras, logos, aviso de datos)
       navigation/    NavHost y rutas
-      theme/         tema y colores
+      theme/         tema y colores (la paleta está en res/values/colors.xml)
 
   Datos en Firestore (siempre bajo el usuario autenticado):
-    users/{uid}/quotes/{SÍMBOLO}_{hora}   precio, variación, máximo, mínimo, hora
-    users/{uid}/watchlist/{SÍMBOLO}       favoritos
+    users/{uid}/quotes/{SÍMBOLO}_{aaaa-mm-dd}   precio, variación, máximo,
+                                                mínimo, hora (uno por empresa y día)
+    users/{uid}/watchlist/{SÍMBOLO}             favoritos
 
   Librerías: Navigation Compose, Retrofit + Gson, OkHttp (logging), Firebase Auth
   y Firestore, Coil (mostrar los logos guardados).
@@ -184,8 +205,9 @@ una gráfica, estadísticas y una comparación entre sectores.
   Iconos: Google Material Symbols (https://fonts.google.com/icons), licencia
   Apache 2.0, incluidos como vectores en app/src/main/res/drawable (ic_*.xml).
 
-  Pruebas unitarias (app/src/test): cálculo de estadísticas y comparación de
-  sectores.  Se ejecutan con:  ./gradlew testDebugUnitTest
+  Pruebas unitarias (app/src/test): estadísticas, comparación de sectores,
+  ordenación, limitador de peticiones, histórico, moneda, caducidad y tandas de
+  cotizaciones, logos. Se ejecutan con:  ./gradlew testDebugUnitTest
 
 
 7. CAPTURAS Y VÍDEO
@@ -201,17 +223,29 @@ una gráfica, estadísticas y una comparación entre sectores.
     (Infosys se usa a través de su ADR, INFY).
   - Límite de peticiones: con 20 empresas por sector, cargar los cuatro sectores
     supera las ~60 peticiones por minuto del plan gratuito. La aplicación espacia
-    sus llamadas (máximo 50 por minuto), así que si se recorren los sectores muy
-    deprisa, la carga puede tardar unos segundos en completarse. Pedir solo
-    10 cotizaciones por tanda reduce mucho este caso.
-  - Los precios están en dólares y pueden tener retraso respecto al mercado.
+    sus llamadas (máximo 50 por minuto) y pide las cotizaciones por tandas, así
+    que si se recorren los sectores muy deprisa la carga puede tardar unos
+    segundos. Si Finnhub llegara a rechazar peticiones (HTTP 429), la lista
+    mantiene las cotizaciones guardadas y muestra el aviso de datos antiguos,
+    que en ese caso habla de falta de conexión aunque sí la haya.
   - Todos los precios están en dólares: las 80 empresas cotizan en EE. UU. (o
-    como ADR u OTC) y Finnhub y Yahoo los dan en esa moneda. Solo la
-    capitalización llega en moneda local (TWD, INR, JPY, HKD, CHF), y se
-    convierte a dólares. Finnhub la da en la moneda de la bolsa de origen,
-    que se deduce de la bolsa porque su campo "currency" es la moneda de
-    reporte y no coincide en Lenovo, Xiaomi ni Logitech.
+    como ADR u OTC) y Finnhub y Yahoo los dan en esa moneda, con retraso
+    respecto al mercado. Solo la capitalización llega en moneda local (TWD, INR,
+    JPY, HKD, CHF), y se convierte a dólares. Finnhub la da en la moneda de la
+    bolsa de origen, que se deduce de la bolsa porque su campo "currency" es la
+    moneda de reporte y no coincide en Lenovo, Xiaomi ni Logitech.
   - El histórico usa un endpoint no oficial de Yahoo Finance, que puede
     cambiar o limitar peticiones. Si falla, el detalle muestra lo que ya hay
     guardado en Firestore.
   - Esta aplicación es un ejercicio académico; no ofrece asesoramiento financiero.
+
+9. ENTREGA
+----------
+  Para generar el zip sin los ficheros innecesarios (.gradle, .idea, build,
+  .kotlin, .git y local.properties, que lleva la clave de Finnhub), desde la
+  raíz del proyecto y con PowerShell 7:
+
+    pwsh scripts/crear-zip.ps1
+
+  Crea tech-watch.zip en el Escritorio, con este LÉEME.txt, la carpeta capturas/
+  y app/google-services.json (el proyecto de Firebase del autor).
