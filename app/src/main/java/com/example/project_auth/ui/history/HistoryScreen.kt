@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,6 +35,7 @@ import com.example.project_auth.data.QuoteSnapshot
 import com.example.project_auth.domain.Companies
 import com.example.project_auth.domain.PriceStats
 import com.example.project_auth.ui.common.RoundIconButton
+import com.example.project_auth.ui.theme.FavouriteColor
 import com.example.project_auth.ui.theme.changeColor
 import java.text.DateFormat
 import java.util.Date
@@ -66,6 +70,15 @@ fun HistoryScreen(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+            }
+            IconButton(onClick = viewModel::toggleFavourite) {
+                Icon(
+                    painter = painterResource(if (state.isFavourite) R.drawable.ic_star_filled else R.drawable.ic_star),
+                    contentDescription = stringResource(
+                        if (state.isFavourite) R.string.watchlist_remove else R.string.watchlist_add,
+                    ),
+                    tint = if (state.isFavourite) FavouriteColor else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             RoundIconButton(
                 icon = R.drawable.ic_close,
