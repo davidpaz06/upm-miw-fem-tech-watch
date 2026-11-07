@@ -12,7 +12,7 @@ param(
 $root = Split-Path $PSScriptRoot -Parent
 $staging = Join-Path ([IO.Path]::GetTempPath()) ("tech-watch-" + [guid]::NewGuid())
 
-# .gradle, .idea, build, .kotlin, .claude y .git sobran; local.properties lleva rutas y la clave de Finnhub.
+# .gradle, .idea, build, .kotlin, .claude y .git sobran; local.properties lleva rutas del equipo (la clave viaja en finnhub.properties).
 robocopy $root $staging /E /XD .gradle .idea build .kotlin .claude .git /XF local.properties *.iml | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "robocopy fallo con codigo $LASTEXITCODE" }
 
