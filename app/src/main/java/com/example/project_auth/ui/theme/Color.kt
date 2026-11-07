@@ -2,14 +2,6 @@ package com.example.project_auth.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Teal40 = Color(0xFF00695C)
-val BlueGrey40 = Color(0xFF455A64)
-val Amber40 = Color(0xFF8D6E00)
-
-val Teal80 = Color(0xFF4DB6AC)
-val BlueGrey80 = Color(0xFFB0BEC5)
-val Amber80 = Color(0xFFFFCA28)
-
 /** Filled favourite star; readable on both light and dark surfaces. */
 val FavouriteColor = Color(0xFFF9A825)
 

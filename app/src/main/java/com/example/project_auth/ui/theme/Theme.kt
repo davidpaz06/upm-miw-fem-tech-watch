@@ -8,25 +8,61 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.graphics.Color
+import com.example.project_auth.R
 
 private const val THEME_TRANSITION_MILLIS = 400
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Teal80,
-    secondary = BlueGrey80,
-    tertiary = Amber80,
-    error = Red60,
-    onError = Color.White,
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Teal40,
-    secondary = BlueGrey40,
-    tertiary = Amber40,
-    error = Red40,
-    onError = Color.White,
-)
+/**
+ * Built from res/values/colors.xml, so that file is the one place the palette is defined:
+ * purple for primary and the pills, amber and orange for the warning banner and accents.
+ */
+@Composable
+private fun appColorScheme(darkTheme: Boolean): ColorScheme {
+    val purple200 = colorResource(R.color.purple_200)
+    val purple500 = colorResource(R.color.purple_500)
+    val purple700 = colorResource(R.color.purple_700)
+    val amber = colorResource(R.color.teal_200)
+    val orange = colorResource(R.color.teal_700)
+    val black = colorResource(R.color.black)
+    val white = colorResource(R.color.white)
+    return if (darkTheme) {
+        darkColorScheme(
+            primary = purple200,
+            onPrimary = black,
+            primaryContainer = purple700,
+            onPrimaryContainer = white,
+            secondary = amber,
+            onSecondary = black,
+            secondaryContainer = purple700,
+            onSecondaryContainer = white,
+            tertiary = amber,
+            onTertiary = black,
+            tertiaryContainer = amber,
+            onTertiaryContainer = black,
+            error = Red60,
+            onError = white,
+        )
+    } else {
+        lightColorScheme(
+            primary = purple500,
+            onPrimary = white,
+            primaryContainer = purple200,
+            onPrimaryContainer = black,
+            secondary = orange,
+            onSecondary = black,
+            secondaryContainer = purple200,
+            onSecondaryContainer = black,
+            tertiary = amber,
+            onTertiary = black,
+            tertiaryContainer = amber,
+            onTertiaryContainer = black,
+            error = Red40,
+            onError = white,
+        )
+    }
+}
 
 @Composable
 fun ProjectauthTheme(
@@ -34,7 +70,7 @@ fun ProjectauthTheme(
     content: @Composable () -> Unit,
 ) {
     MaterialTheme(
-        colorScheme = (if (darkTheme) DarkColorScheme else LightColorScheme).animated(),
+        colorScheme = appColorScheme(darkTheme).animated(),
         typography = Typography,
         content = content,
     )
