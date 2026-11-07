@@ -17,6 +17,7 @@
     <string name="quote_unavailable">No disponible</string>
     <string name="home_error">No se pudieron cargar las cotizaciones. Revisa tu conexión y tu clave de Finnhub.</string>
     <string name="home_retry">Reintentar</string>
+    <string name="stale_data_banner">Sin conexión con Finnhub. Se muestran los últimos datos guardados (%1$s).</string>
 
     <string name="watchlist_add">Añadir a favoritos</string>
     <string name="watchlist_remove">Quitar de favoritos</string>
