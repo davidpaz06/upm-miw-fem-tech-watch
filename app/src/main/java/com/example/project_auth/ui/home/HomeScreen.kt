@@ -13,7 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
@@ -74,7 +74,10 @@ fun HomeScreen(
                 Text(stringResource(R.string.stats_title))
             }
         }
-        PrimaryTabRow(selectedTabIndex = Sector.entries.indexOf(state.sector)) {
+        PrimaryScrollableTabRow(
+            selectedTabIndex = Sector.entries.indexOf(state.sector),
+            edgePadding = 0.dp,
+        ) {
             Sector.entries.forEach { sector ->
                 Tab(
                     selected = sector == state.sector,
