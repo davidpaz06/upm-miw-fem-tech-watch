@@ -3,10 +3,12 @@ package com.example.project_auth.ui.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.project_auth.data.FirestoreRepository
+import com.example.project_auth.data.PriceHistoryRepository
 import com.example.project_auth.data.QuoteSnapshot
 import com.example.project_auth.data.StockRepository
 import com.example.project_auth.data.remote.CompanyProfile
 import com.example.project_auth.domain.PriceStats
+import com.example.project_auth.domain.entriesToSave
 import com.example.project_auth.domain.toPriceStats
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +33,7 @@ class HistoryViewModel(
     private val symbol: String,
     private val firestore: FirestoreRepository = FirestoreRepository(),
     private val stocks: StockRepository = StockRepository(),
+    private val priceHistory: PriceHistoryRepository = PriceHistoryRepository(),
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HistoryUiState())
@@ -56,15 +59,40 @@ class HistoryViewModel(
         loadProfile()
     }
 
+    /**
+     * Queries the last [ENTRIES] daily prices and builds the chart from that answer, then brings
+     * Firestore up to date with it. If the query fails, it falls back to what Firestore already has.
+     */
     fun load() {
         _state.update { it.copy(loading = true, failed = false) }
         viewModelScope.launch {
-            firestore.getSnapshots(symbol)
-                .onSuccess { snapshots ->
-                    _state.update { it.copy(snapshots = snapshots, loading = false) }
-                }
-                .onFailure { _state.update { it.copy(loading = false, failed = true) } }
+            val history = priceHistory.getHistory(symbol, ENTRIES).getOrNull()
+            if (history != null) {
+                _state.update { it.copy(snapshots = history, loading = false) }
+                saveToFirestore(history)
+            } else {
+                loadFromFirestore()
+            }
         }
+    }
+
+    private suspend fun saveToFirestore(history: List<QuoteSnapshot>) {
+        // If the stored entries cannot be read, writing blindly would only duplicate work.
+        firestore.getSnapshots(symbol).onSuccess { stored ->
+            firestore.saveSnapshots(entriesToSave(history, stored))
+        }
+    }
+
+    private suspend fun loadFromFirestore() {
+        firestore.getSnapshots(symbol)
+            .onSuccess { stored ->
+                _state.update { it.copy(snapshots = stored.takeLast(ENTRIES), loading = false) }
+            }
+            .onFailure { _state.update { it.copy(loading = false, failed = true) } }
+    }
+
+    private companion object {
+        const val ENTRIES = PriceHistoryRepository.DEFAULT_COUNT
     }
 
     /** The profile is decoration, so a failure is ignored rather than shown. */

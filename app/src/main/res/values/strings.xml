@@ -38,7 +38,7 @@
     <string name="stats_min">Mínimo</string>
     <string name="stats_average">Media</string>
     <string name="stats_total_change">Variación total</string>
-    <string name="stats_count">Consultas guardadas</string>
+    <string name="stats_count">Días con datos</string>
 
     <string name="profile_market_cap">Capitalización: %1$s</string>
     <!-- Spanish long scale: 1 billón = 10^12. Values arrive in millions of dollars. -->
@@ -47,13 +47,13 @@
     <string name="market_cap_millions">%1$.0f millones $</string>
 
     <string name="stats_title">Estadísticas</string>
-    <string name="stats_sector_hint">Media de la variación acumulada de cada empresa del sector, según tus consultas guardadas.</string>
+    <string name="stats_sector_hint">Media de la variación acumulada de cada empresa del sector, según el historial guardado.</string>
     <string name="stats_companies_with_data">%1$d de %2$d empresas con datos</string>
     <string name="stats_not_enough_data">Sin datos suficientes</string>
 
     <string name="detail_close">Cerrar</string>
     <string name="history_error">No se pudo cargar el historial</string>
-    <string name="history_empty">Aún no hay consultas guardadas de esta empresa. Vuelve a cargar su sector para registrar un precio.</string>
+    <string name="history_empty">No hay datos de precio de esta empresa.</string>
 
     <string name="auth_error_invalid_email">Introduce un correo electrónico válido</string>
     <string name="auth_error_short_password">La contraseña debe tener al menos 6 caracteres</string>

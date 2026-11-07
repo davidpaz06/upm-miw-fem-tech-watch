@@ -171,7 +171,7 @@ private fun SnapshotRow(snapshot: QuoteSnapshot) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+            DateFormat.getDateInstance(DateFormat.MEDIUM)
                 .format(Date(snapshot.timestamp * 1000)),
             style = MaterialTheme.typography.bodyMedium,
         )
