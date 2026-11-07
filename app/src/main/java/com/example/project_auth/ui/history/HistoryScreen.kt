@@ -120,7 +120,7 @@ private fun StatsSummary(stats: PriceStats) {
             label = R.string.stats_total_change,
             value = stats.totalChangePercent?.let { "%+.2f%% ($%+.2f)".format(it, stats.totalChange) }
                 ?: "—",
-            color = stats.totalChangePercent?.let(::changeColor),
+            color = stats.totalChangePercent?.let { changeColor(it) },
         )
         StatLine(R.string.stats_count, stats.count.toString())
     }
