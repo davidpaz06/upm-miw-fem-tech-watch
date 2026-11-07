@@ -10,6 +10,7 @@ import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
 import com.example.project_auth.domain.Company
 import com.example.project_auth.domain.Sector
+import com.example.project_auth.domain.areAllFresh
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -60,18 +61,31 @@ class HomeViewModel(
     /** Ignored while a load is running: restarting it would cancel it and request the same quotes again. */
     fun refresh() {
         if (_state.value.loading) return
-        load()
+        load(force = true)
     }
 
     /**
-     * Shows the locally saved quotes straight away, then replaces them with fresh ones.
+     * Shows the locally saved quotes straight away, then replaces them with fresh ones. When every
+     * saved quote of the sector is less than a minute old they are simply kept, unless [force] is
+     * set (pull-to-refresh), so going back and forth between tabs does not ask Finnhub again each time.
      * Any symbol Finnhub cannot answer keeps its saved quote, and [HomeUiState.offlineSince]
      * tells the UI that some of what it shows is old.
      */
-    private fun load() {
+    private fun load(force: Boolean = false) {
         loadJob?.cancel()
         val companies = Companies.bySector(_state.value.sector)
         val cached = cache.load(companies.map { it.symbol })
+        if (!force && areAllFresh(cached, companies.map { it.symbol }, System.currentTimeMillis())) {
+            _state.update {
+                it.copy(
+                    items = companies.map { company -> CompanyQuote(company, cached[company.symbol]?.quote) },
+                    loading = false,
+                    loaded = true,
+                    offlineSince = null,
+                )
+            }
+            return
+        }
         _state.update { state ->
             state.copy(
                 loading = true,

@@ -8,6 +8,7 @@ import com.example.project_auth.data.QuoteCache
 import com.example.project_auth.data.StockRepository
 import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
+import com.example.project_auth.domain.isFresh
 import com.example.project_auth.ui.home.CompanyQuote
 import com.example.project_auth.ui.home.SortField
 import com.example.project_auth.ui.home.SortOrder
@@ -66,7 +67,10 @@ class WatchlistViewModel(
         val cached = cache.load(newSymbols)
         _state.value = _state.value.copy(items = itemsFor(newSymbols, cached), loading = true)
 
-        val missing = newSymbols.filter { forceRefresh || it !in quotes }
+        // A quote saved less than a minute ago is reused unless the user pulled to refresh.
+        val now = System.currentTimeMillis()
+        fun isCurrent(symbol: String) = symbol in quotes || cached[symbol]?.isFresh(now) == true
+        val missing = newSymbols.filter { forceRefresh || !isCurrent(it) }
         val fresh = repository.getQuotes(missing)
             .mapNotNull { (symbol, result) -> result.getOrNull()?.let { symbol to it } }
             .toMap()
@@ -77,7 +81,7 @@ class WatchlistViewModel(
             items = itemsFor(newSymbols, cached),
             loading = false,
             offlineSince = newSymbols
-                .filter { it !in quotes }
+                .filter { it !in quotes && cached[it]?.isFresh(now) != true }
                 .mapNotNull { cached[it]?.savedAt }
                 .minOrNull(),
         )
