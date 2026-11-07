@@ -84,6 +84,20 @@ object Companies {
         Company("SONY", "Sony", Sector.HARDWARE),
         Company("LNVGY", "Lenovo", Sector.HARDWARE),
         Company("XIACF", "Xiaomi", Sector.HARDWARE),
+        Company("HPE", "Hewlett Packard Enterprise", Sector.HARDWARE),
+        Company("LOGI", "Logitech", Sector.HARDWARE),
+        Company("GRMN", "Garmin", Sector.HARDWARE),
+        Company("NTAP", "NetApp", Sector.HARDWARE),
+        Company("WDC", "Western Digital", Sector.HARDWARE),
+        Company("STX", "Seagate", Sector.HARDWARE),
+        Company("CSCO", "Cisco", Sector.HARDWARE),
+        Company("ZBRA", "Zebra Technologies", Sector.HARDWARE),
+        Company("SONO", "Sonos", Sector.HARDWARE),
+        Company("CRSR", "Corsair Gaming", Sector.HARDWARE),
+        Company("MSI", "Motorola Solutions", Sector.HARDWARE),
+        Company("ANET", "Arista Networks", Sector.HARDWARE),
+        Company("PSTG", "Pure Storage", Sector.HARDWARE),
+        Company("KEYS", "Keysight Technologies", Sector.HARDWARE),
     )
 
     fun bySector(sector: Sector): List<Company> = all.filter { it.sector == sector }
