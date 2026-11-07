@@ -100,7 +100,12 @@ fun HomeScreen(
                     }
                 }
 
-                else -> QuoteList(items = state.items, sort = state.sort, onOpenDetail = onOpenDetail)
+                else -> QuoteList(
+                    items = state.items,
+                    sort = state.sort,
+                    onOpenDetail = onOpenDetail,
+                    onLastVisibleChange = viewModel::onRowsVisible,
+                )
             }
         }
     }

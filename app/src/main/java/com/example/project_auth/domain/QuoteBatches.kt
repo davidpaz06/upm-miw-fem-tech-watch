@@ -7,7 +7,7 @@ const val QUOTE_EAGER_COUNT = 10
 const val QUOTE_BATCH_SIZE = 10
 
 /** How many rows below the last visible one are already worth requesting. */
-const val QUOTE_LOOKAHEAD = 3
+const val QUOTE_LOOKAHEAD = 1
 
 /** Which of the stale symbols are requested now and which wait for their rows to be seen. */
 data class QuotePlan(val now: List<String>, val later: List<String>)

@@ -54,9 +54,9 @@ class QuoteBatchesTest {
     @Test
     fun theNextBatchIsRequestedWhenTheWaitingRowsGetClose() {
         val waiting = rows.drop(10).toSet()
-        // Row 6 is the last visible: the first waiting row (index 10) is still more than 3 rows away.
-        assertTrue(nextQuoteBatch(rows, waiting, lastVisible = 6).isEmpty())
-        assertEquals(rows.drop(10), nextQuoteBatch(rows, waiting, lastVisible = 7))
+        // The waiting rows start at index 10: they are requested once row 9 is visible.
+        assertTrue(nextQuoteBatch(rows, waiting, lastVisible = 8).isEmpty())
+        assertEquals(rows.drop(10), nextQuoteBatch(rows, waiting, lastVisible = 9))
     }
 
     @Test

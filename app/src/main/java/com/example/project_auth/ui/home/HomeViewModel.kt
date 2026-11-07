@@ -11,6 +11,7 @@ import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
 import com.example.project_auth.domain.Company
 import com.example.project_auth.domain.Sector
+import com.example.project_auth.domain.nextQuoteBatch
 import com.example.project_auth.domain.planQuoteLoad
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,6 +47,9 @@ class HomeViewModel(
     /** Stale symbols of the current sector whose request waits until their row is needed. */
     private var waiting: Set<String> = emptySet()
 
+    /** Index, in the order the rows are shown, of the last row on screen. */
+    private var lastVisible = -1
+
     init {
         load()
     }
@@ -53,6 +57,7 @@ class HomeViewModel(
     fun selectSector(sector: Sector) {
         if (sector == _state.value.sector) return
         waiting = emptySet()
+        lastVisible = -1
         _state.update {
             it.copy(sector = sector, items = emptyList(), loading = false, loaded = false, offlineSince = null)
         }
@@ -104,7 +109,25 @@ class HomeViewModel(
         viewModelScope.launch {
             saveSnapshots(loader.fetch(plan.now))
             publish(sector, loading = false)
+            if (_state.value.sector == sector) fetchVisibleWaiting()
         }
+    }
+
+    /**
+     * Called as the list scrolls. Once the rows being shown get close to the ones that wait, the
+     * next batch is requested, so they arrive already updated. Ignored while a load is running;
+     * it is checked again when that load ends.
+     */
+    fun onRowsVisible(lastVisibleIndex: Int) {
+        lastVisible = lastVisibleIndex
+        fetchVisibleWaiting()
+    }
+
+    private fun fetchVisibleWaiting() {
+        val state = _state.value
+        if (state.loading || waiting.isEmpty()) return
+        val order = displayOrder(Companies.bySector(state.sector))
+        fetchWaiting(nextQuoteBatch(order, waiting, lastVisible))
     }
 
     private fun fetchWaiting(batch: List<String>) {
