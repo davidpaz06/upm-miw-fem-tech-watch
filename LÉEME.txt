@@ -71,9 +71,14 @@ una gráfica, estadísticas y una comparación entre sectores.
     primero esos datos guardados y después se refrescan; si Finnhub no responde,
     se mantienen y un aviso indica de cuándo son. El historial y las estadísticas
     usan la caché local de Firestore. Para no pedir datos de más, las
-    cotizaciones guardadas hace menos de un minuto se reutilizan sin volver
-    a consultarlas al cambiar de pestaña; deslizar para actualizar siempre
-    consulta de nuevo.
+    cotizaciones se piden por tandas: al abrir un sector o al deslizar para
+    actualizar solo se piden las 10 primeras filas (más las que no tengan
+    ningún dato guardado); las demás se piden de 10 en 10 cuando el scroll
+    se acerca a ellas y, mientras tanto, muestran su última cotización
+    guardada. Con la ordenación por precio se piden las 20, porque comparar
+    precios los necesita todos. Una cotización consultada hace menos de un
+    minuto no se vuelve a pedir al cambiar de pestaña ni al volver a Home;
+    deslizar para actualizar siempre consulta de nuevo.
   - Logos: cada empresa muestra su logo en el listado y en el detalle. Se
     descarga una sola vez, la primera vez que se necesita, y se guarda en el
     almacenamiento interno de la aplicación (carpeta files/logos); las siguientes
@@ -197,7 +202,8 @@ una gráfica, estadísticas y una comparación entre sectores.
   - Límite de peticiones: con 20 empresas por sector, cargar los cuatro sectores
     supera las ~60 peticiones por minuto del plan gratuito. La aplicación espacia
     sus llamadas (máximo 50 por minuto), así que si se recorren los sectores muy
-    deprisa, la carga puede tardar unos segundos en completarse.
+    deprisa, la carga puede tardar unos segundos en completarse. Pedir solo
+    10 cotizaciones por tanda reduce mucho este caso.
   - Los precios están en dólares y pueden tener retraso respecto al mercado.
   - Todos los precios están en dólares: las 80 empresas cotizan en EE. UU. (o
     como ADR u OTC) y Finnhub y Yahoo los dan en esa moneda. Solo la
