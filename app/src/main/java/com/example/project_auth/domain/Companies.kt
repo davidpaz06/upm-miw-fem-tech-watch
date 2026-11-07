@@ -28,6 +28,10 @@ object Companies {
         Company("IBM", "IBM", Sector.CONSULTING),
         Company("CTSH", "Cognizant", Sector.CONSULTING),
         Company("INFY", "Infosys", Sector.CONSULTING),
+        Company("BAH", "Booz Allen Hamilton", Sector.CONSULTING),
+        Company("FCN", "FTI Consulting", Sector.CONSULTING),
+        Company("GLOB", "Globant", Sector.CONSULTING),
+        Company("EPAM", "EPAM Systems", Sector.CONSULTING),
     )
 
     fun bySector(sector: Sector): List<Company> = all.filter { it.sector == sector }
