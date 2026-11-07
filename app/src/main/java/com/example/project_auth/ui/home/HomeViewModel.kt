@@ -4,14 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.project_auth.data.FirestoreRepository
 import com.example.project_auth.data.QuoteCache
+import com.example.project_auth.data.QuoteLoader
 import com.example.project_auth.data.StockRepository
 import com.example.project_auth.data.toSnapshot
 import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
 import com.example.project_auth.domain.Company
 import com.example.project_auth.domain.Sector
-import com.example.project_auth.domain.areAllFresh
-import kotlinx.coroutines.Job
+import com.example.project_auth.domain.planQuoteLoad
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,13 +36,15 @@ data class HomeUiState(
 class HomeViewModel(
     private val repository: StockRepository = StockRepository(),
     private val firestore: FirestoreRepository = FirestoreRepository(),
-    private val cache: QuoteCache = QuoteCache.instance,
+    cache: QuoteCache = QuoteCache.instance,
+    private val loader: QuoteLoader = QuoteLoader(repository::getQuotes, cache::load, cache::save),
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state.asStateFlow()
 
-    private var loadJob: Job? = null
+    /** Stale symbols of the current sector whose request waits until their row is needed. */
+    private var waiting: Set<String> = emptySet()
 
     init {
         load()
@@ -50,71 +52,89 @@ class HomeViewModel(
 
     fun selectSector(sector: Sector) {
         if (sector == _state.value.sector) return
+        waiting = emptySet()
         _state.update {
             it.copy(sector = sector, items = emptyList(), loading = false, loaded = false, offlineSince = null)
         }
         load()
     }
 
-    fun selectSort(field: SortField) = _state.update { it.copy(sort = it.sort.select(field)) }
+    fun selectSort(field: SortField) {
+        _state.update { it.copy(sort = it.sort.select(field)) }
+        // Ordering by price compares every company, so it cannot wait for the rows to be seen.
+        if (_state.value.sort.field == SortField.PRICE) fetchWaiting(waiting.toList())
+    }
 
-    /** Ignored while a load is running: restarting it would cancel it and request the same quotes again. */
+    /** Ignored while a load is running, so a second pull cannot request the same quotes again. */
     fun refresh() {
         if (_state.value.loading) return
         load(force = true)
     }
 
     /**
-     * Shows the locally saved quotes straight away, then replaces them with fresh ones. When every
-     * saved quote of the sector is less than a minute old they are simply kept, unless [force] is
-     * set (pull-to-refresh), so going back and forth between tabs does not ask Finnhub again each time.
-     * Any symbol Finnhub cannot answer keeps its saved quote, and [HomeUiState.offlineSince]
-     * tells the UI that some of what it shows is old.
+     * Shows the quotes already known (saved on the device or fetched earlier) straight away, then
+     * asks for the stale ones: only the first rows, plus any row with no quote at all, and the rest
+     * wait in [waiting]. A quote fetched less than a minute ago is not asked for again unless
+     * [force] is set (pull-to-refresh). Any symbol Finnhub cannot answer keeps its old quote, and
+     * [HomeUiState.offlineSince] tells the UI that some of what it shows is old.
      */
     private fun load(force: Boolean = false) {
-        loadJob?.cancel()
-        val companies = Companies.bySector(_state.value.sector)
-        val cached = cache.load(companies.map { it.symbol })
-        if (!force && areAllFresh(cached, companies.map { it.symbol }, System.currentTimeMillis())) {
-            _state.update {
-                it.copy(
-                    items = companies.map { company -> CompanyQuote(company, cached[company.symbol]?.quote) },
-                    loading = false,
-                    loaded = true,
-                    offlineSince = null,
-                )
-            }
+        val sector = _state.value.sector
+        val companies = Companies.bySector(sector)
+        val symbols = companies.map { it.symbol }
+        loader.restore(symbols)
+
+        val plan = planQuoteLoad(
+            displayOrder = displayOrder(companies),
+            stale = loader.staleOf(symbols, force),
+            hasQuote = loader::hasQuote,
+            all = _state.value.sort.field == SortField.PRICE,
+        )
+        waiting = plan.later.toSet()
+        if (plan.now.isEmpty()) {
+            publish(sector, loading = false)
             return
         }
         _state.update { state ->
             state.copy(
                 loading = true,
-                items = state.items.ifEmpty {
-                    if (cached.isEmpty()) emptyList() else companies.map { CompanyQuote(it, cached[it.symbol]?.quote) }
-                },
+                items = if (symbols.any(loader::hasQuote)) itemsOf(companies) else state.items,
             )
         }
-        loadJob = viewModelScope.launch {
-            val fresh = repository.getQuotes(companies.map { it.symbol })
-                .mapNotNull { (symbol, result) -> result.getOrNull()?.let { symbol to it } }
-                .toMap()
-            cache.save(fresh)
-            _state.update {
-                it.copy(
-                    items = companies.map { company ->
-                        CompanyQuote(company, fresh[company.symbol] ?: cached[company.symbol]?.quote)
-                    },
-                    loading = false,
-                    loaded = true,
-                    offlineSince = companies
-                        .filter { it.symbol !in fresh }
-                        .mapNotNull { cached[it.symbol]?.savedAt }
-                        .minOrNull(),
-                )
-            }
-            saveSnapshots(fresh)
+        viewModelScope.launch {
+            saveSnapshots(loader.fetch(plan.now))
+            publish(sector, loading = false)
         }
     }
+
+    private fun fetchWaiting(batch: List<String>) {
+        if (batch.isEmpty()) return
+        waiting -= batch.toSet()
+        val sector = _state.value.sector
+        viewModelScope.launch {
+            saveSnapshots(loader.fetch(batch))
+            publish(sector)
+        }
+    }
+
+    /** Ignored if the user already moved to another sector: its quotes were still saved by the loader. */
+    private fun publish(sector: Sector, loading: Boolean? = null) {
+        _state.update { state ->
+            if (state.sector != sector) return@update state
+            val companies = Companies.bySector(sector)
+            state.copy(
+                items = itemsOf(companies),
+                loading = loading ?: state.loading,
+                loaded = true,
+                offlineSince = loader.offlineSince(companies.map { it.symbol }),
+            )
+        }
+    }
+
+    private fun itemsOf(companies: List<Company>) = companies.map { CompanyQuote(it, loader.quoteOf(it.symbol)) }
+
+    private fun displayOrder(companies: List<Company>): List<String> =
+        itemsOf(companies).sortedWith(_state.value.sort).map { it.company.symbol }
 
     /** Runs on its own scope so a slow or failing write never blocks the quote list. */
     private fun saveSnapshots(quotes: Map<String, Quote>) {
