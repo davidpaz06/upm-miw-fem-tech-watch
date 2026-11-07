@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.project_auth.R
+import com.example.project_auth.ui.common.StaleDataBanner
 import com.example.project_auth.ui.home.QuoteRow
 
 @Composable
@@ -49,6 +50,7 @@ fun WatchlistScreen(
                 style = MaterialTheme.typography.titleLarge,
             )
         }
+        state.offlineSince?.let { StaleDataBanner(it) }
         PullToRefreshBox(
             isRefreshing = state.loading && state.items.isNotEmpty(),
             onRefresh = viewModel::refresh,

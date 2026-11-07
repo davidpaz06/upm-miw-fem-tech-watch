@@ -2,7 +2,9 @@ package com.example.project_auth.ui.watchlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.project_auth.data.CachedQuote
 import com.example.project_auth.data.FirestoreRepository
+import com.example.project_auth.data.QuoteCache
 import com.example.project_auth.data.StockRepository
 import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
@@ -17,18 +19,21 @@ import kotlinx.coroutines.launch
 data class WatchlistUiState(
     val items: List<CompanyQuote> = emptyList(),
     val loading: Boolean = true,
+    /** Device time (epoch millis) of the oldest saved quote shown instead of a fresh one. */
+    val offlineSince: Long? = null,
 )
 
 class WatchlistViewModel(
     private val repository: StockRepository = StockRepository(),
     private val firestore: FirestoreRepository = FirestoreRepository(),
+    private val cache: QuoteCache = QuoteCache.instance,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WatchlistUiState())
     val state: StateFlow<WatchlistUiState> = _state.asStateFlow()
 
-    /** Quotes already fetched, so adding or removing a favourite only asks for what is missing. */
-    private val quotes = mutableMapOf<String, Quote?>()
+    /** Fresh quotes fetched this session, so adding or removing a favourite only asks for what is missing. */
+    private val quotes = mutableMapOf<String, Quote>()
     private var symbols: Set<String> = emptySet()
 
     init {
@@ -47,16 +52,34 @@ class WatchlistViewModel(
         viewModelScope.launch { firestore.removeFromWatchlist(symbol) }
     }
 
+    /**
+     * Shows fresh quotes where there are any and the locally saved ones otherwise, so the
+     * list is not empty while offline or while the first request is in flight.
+     */
     private suspend fun sync(newSymbols: Set<String>, forceRefresh: Boolean) {
         symbols = newSymbols
-        _state.value = _state.value.copy(loading = true)
+        val cached = cache.load(newSymbols)
+        _state.value = _state.value.copy(items = itemsFor(newSymbols, cached), loading = true)
+
         val missing = newSymbols.filter { forceRefresh || it !in quotes }
-        repository.getQuotes(missing).forEach { (symbol, result) -> quotes[symbol] = result.getOrNull() }
+        val fresh = repository.getQuotes(missing)
+            .mapNotNull { (symbol, result) -> result.getOrNull()?.let { symbol to it } }
+            .toMap()
+        quotes += fresh
+        cache.save(fresh)
+
         _state.value = WatchlistUiState(
-            items = newSymbols.sorted().mapNotNull { symbol ->
-                Companies.find(symbol)?.let { CompanyQuote(it, quotes[symbol]) }
-            },
+            items = itemsFor(newSymbols, cached),
             loading = false,
+            offlineSince = newSymbols
+                .filter { it !in quotes }
+                .mapNotNull { cached[it]?.savedAt }
+                .minOrNull(),
         )
     }
+
+    private fun itemsFor(symbols: Set<String>, cached: Map<String, CachedQuote>): List<CompanyQuote> =
+        symbols.sorted().mapNotNull { symbol ->
+            Companies.find(symbol)?.let { CompanyQuote(it, quotes[symbol] ?: cached[symbol]?.quote) }
+        }
 }
