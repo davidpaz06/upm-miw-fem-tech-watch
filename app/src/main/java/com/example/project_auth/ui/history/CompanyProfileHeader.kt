@@ -14,10 +14,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.project_auth.R
 import com.example.project_auth.data.remote.CompanyProfile
+import com.example.project_auth.domain.MarketCap
 import com.example.project_auth.ui.common.CompanyLogo
 
 @Composable
-fun CompanyProfileHeader(symbol: String, profile: CompanyProfile, modifier: Modifier = Modifier) {
+fun CompanyProfileHeader(
+    symbol: String,
+    profile: CompanyProfile,
+    marketCap: MarketCap?,
+    modifier: Modifier = Modifier,
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -31,21 +37,44 @@ fun CompanyProfileHeader(symbol: String, profile: CompanyProfile, modifier: Modi
             if (details.isNotEmpty()) {
                 Text(details, style = MaterialTheme.typography.bodyMedium)
             }
-            profile.marketCap?.let {
-                Text(
-                    stringResource(R.string.profile_market_cap, formatMarketCap(it)),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            marketCap?.let { MarketCapLines(it) }
         }
     }
 }
 
-/** Finnhub reports market capitalization in millions of dollars. */
+/**
+ * The amount in US dollars when it is known, otherwise in its own currency. When the company
+ * trades in another currency, a second line gives the original amount and the exchange rate used.
+ */
 @Composable
-private fun formatMarketCap(millions: Double): String = when {
-    millions >= 1_000_000 -> stringResource(R.string.market_cap_trillions, millions / 1_000_000)
-    millions >= 1_000 -> stringResource(R.string.market_cap_billions, millions / 1_000)
-    else -> stringResource(R.string.market_cap_millions, millions)
+private fun MarketCapLines(marketCap: MarketCap) {
+    val usd = marketCap.usdMillions
+    val main = if (usd != null) formatMarketCap(usd, "$") else formatMarketCap(marketCap.localMillions, marketCap.currency)
+    Text(
+        stringResource(R.string.profile_market_cap, main),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+
+    val rate = marketCap.unitsPerUsd
+    if (!marketCap.isUsd && usd != null && rate != null) {
+        Text(
+            stringResource(
+                R.string.market_cap_conversion,
+                formatMarketCap(marketCap.localMillions, marketCap.currency),
+                "%.2f".format(rate),
+                marketCap.currency,
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/** [millions] is in millions of [unit], which is a symbol such as "$" or a code such as "TWD". */
+@Composable
+private fun formatMarketCap(millions: Double, unit: String): String = when {
+    millions >= 1_000_000 -> stringResource(R.string.market_cap_trillions, millions / 1_000_000, unit)
+    millions >= 1_000 -> stringResource(R.string.market_cap_billions, millions / 1_000, unit)
+    else -> stringResource(R.string.market_cap_millions, millions, unit)
 }

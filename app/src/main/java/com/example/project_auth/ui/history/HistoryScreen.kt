@@ -86,7 +86,7 @@ fun HistoryScreen(
                 onClick = onClose,
             )
         }
-        state.profile?.let { CompanyProfileHeader(symbol, it) }
+        state.profile?.let { CompanyProfileHeader(symbol, it, state.marketCap) }
         when {
             state.loading -> CenteredBox { CircularProgressIndicator() }
 
