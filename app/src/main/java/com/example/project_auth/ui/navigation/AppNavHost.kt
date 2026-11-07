@@ -58,6 +58,7 @@ fun AppNavHost(modifier: Modifier = Modifier) {
             HomeScreen(
                 onOpenWatchlist = { navController.navigate(Routes.WATCHLIST) },
                 onOpenStats = { navController.navigate(Routes.STATS) },
+                onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenHistory = { navController.navigate(Routes.history(it)) },
             )
         }

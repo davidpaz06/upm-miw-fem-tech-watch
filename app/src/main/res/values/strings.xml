@@ -13,8 +13,6 @@
     <string name="settings_account">Cuenta</string>
     <string name="settings_appearance">Apariencia</string>
     <string name="settings_dark_mode">Modo oscuro</string>
-    <string name="theme_switch_to_dark">Cambiar a modo oscuro</string>
-    <string name="theme_switch_to_light">Cambiar a modo claro</string>
 
     <string name="sector_cloud">Cloud</string>
     <string name="sector_ai">IA</string>

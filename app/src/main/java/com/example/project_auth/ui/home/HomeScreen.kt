@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,7 +18,6 @@ import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,22 +25,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.project_auth.R
-import com.example.project_auth.data.AuthRepository
 import com.example.project_auth.domain.Sector
+import com.example.project_auth.ui.common.Pill
+import com.example.project_auth.ui.common.RoundIconButton
 import com.example.project_auth.ui.common.StaleDataBanner
-import com.example.project_auth.ui.theme.ThemeToggle
 
 @Composable
 fun HomeScreen(
     onOpenWatchlist: () -> Unit,
     onOpenStats: () -> Unit,
+    onOpenSettings: () -> Unit,
     onOpenHistory: (String) -> Unit,
     modifier: Modifier = Modifier,
-    authRepository: AuthRepository = AuthRepository(),
     viewModel: HomeViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -50,29 +49,18 @@ fun HomeScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                authRepository.currentUser?.email.orEmpty(),
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f),
+            Pill(text = stringResource(R.string.watchlist_title), onClick = onOpenWatchlist)
+            Pill(text = stringResource(R.string.stats_title), onClick = onOpenStats)
+            Spacer(Modifier.weight(1f))
+            RoundIconButton(
+                icon = R.drawable.ic_settings,
+                description = stringResource(R.string.settings_title),
+                onClick = onOpenSettings,
             )
-            ThemeToggle()
-            TextButton(onClick = authRepository::signOut) {
-                Text(stringResource(R.string.auth_logout))
-            }
-        }
-        Row(Modifier.padding(horizontal = 8.dp)) {
-            TextButton(onClick = onOpenWatchlist) {
-                Text(stringResource(R.string.watchlist_title))
-            }
-            TextButton(onClick = onOpenStats) {
-                Text(stringResource(R.string.stats_title))
-            }
         }
         PrimaryScrollableTabRow(
             selectedTabIndex = Sector.entries.indexOf(state.sector),
