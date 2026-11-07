@@ -136,25 +136,27 @@ una gráfica, estadísticas y una comparación entre sectores.
   - Android Studio reciente, con JDK 17 o superior (el que incluye Android Studio).
   - Dispositivo o emulador con Android 8.0 (API 26) o superior y conexión a
     Internet.
-  - Una clave gratuita de Finnhub (ver apartado siguiente).
+  - Una clave gratuita de Finnhub (incluida en el zip; ver apartado siguiente).
 
 
 5. CONFIGURACIÓN
 ----------------
-5.1 Clave de la API de Finnhub (obligatoria)
+5.1 Clave de la API de Finnhub
 
-  La clave NO está en el código. Para que la aplicación muestre datos:
+  El zip incluye una clave gratuita del autor en el fichero finnhub.properties
+  (raíz del proyecto), así que la aplicación funciona sin configurar nada:
+  abrir el proyecto en Android Studio, sincronizar Gradle y ejecutar. Es una
+  clave del plan gratuito (unas 60 peticiones por minuto en total); si se
+  agotara por un uso muy intenso, basta esperar un minuto.
 
-    1. Crear una cuenta gratuita en https://finnhub.io y copiar la API key.
-    2. Añadir esta línea al fichero local.properties de la raíz del proyecto
-       (lo crea Android Studio; si no existe, crearlo):
+  Para usar una clave propia: crear una cuenta gratuita en https://finnhub.io,
+  copiar la API key y añadir esta línea al fichero local.properties de la raíz
+  (lo crea Android Studio; tiene prioridad sobre finnhub.properties):
 
-         FINNHUB_API_KEY=tu_clave
+    FINNHUB_API_KEY=tu_clave
 
-    3. Sincronizar Gradle y ejecutar.
-
-  Sin clave, la aplicación arranca pero las cotizaciones muestran el mensaje de
-  error con el botón "Reintentar".
+  Sin ninguna clave, la aplicación arranca pero las cotizaciones muestran el
+  mensaje de error con el botón "Reintentar".
 
 5.2 Firebase
 
@@ -213,6 +215,12 @@ una gráfica, estadísticas y una comparación entre sectores.
 7. CAPTURAS Y VÍDEO
 -------------------
   Capturas: carpeta capturas/
+    01-listado-cloud.png   Listado del sector Cloud en modo oscuro: logos, precio
+                           y variación diaria, pestañas de sector y ordenación.
+    02-detalle-nvda.png    Detalle de NVIDIA: perfil, capitalización en dólares,
+                           gráfica de los últimos 50 cierres, estadísticas e
+                           historial; la estrella indica que es favorita.
+    03-ajustes.png         Ajustes: cuenta, modo oscuro y cierre de sesión.
   Vídeo:    [COMPLETAR: enlace al vídeo, o nombre del fichero si va en el zip]
 
 
@@ -242,10 +250,11 @@ una gráfica, estadísticas y una comparación entre sectores.
 9. ENTREGA
 ----------
   Para generar el zip sin los ficheros innecesarios (.gradle, .idea, build,
-  .kotlin, .git y local.properties, que lleva la clave de Finnhub), desde la
-  raíz del proyecto y con PowerShell 7:
+  .kotlin, .git y local.properties, que lleva rutas del equipo del autor),
+  desde la raíz del proyecto y con PowerShell 7:
 
     pwsh scripts/crear-zip.ps1
 
-  Crea tech-watch.zip en el Escritorio, con este LÉEME.txt, la carpeta capturas/
-  y app/google-services.json (el proyecto de Firebase del autor).
+  Crea tech-watch.zip en el Escritorio, con este LÉEME.txt, la carpeta capturas/,
+  finnhub.properties (clave de Finnhub) y app/google-services.json (el proyecto
+  de Firebase del autor).
