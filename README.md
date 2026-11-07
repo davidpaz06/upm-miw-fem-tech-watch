@@ -122,34 +122,37 @@ detail views are opened.
   Studio).
 - A device or emulator with Android 8.0 (API 26) or later and an Internet
   connection.
-- A free Finnhub key (included in the zip; see the next section).
+- The project secrets (Finnhub key and Firebase configuration), delivered
+  separately in `secretos.txt`: see section 5.
 
 ## 5. Configuration
 
+The credentials are **not** in the repository or in its history. They are
+delivered separately in the `secretos.txt` file (ignored by git), which holds
+everything needed and the steps to follow. In short:
+
 ### 5.1 Finnhub API key
 
-The zip includes a free key of the author in the `finnhub.properties` file
-(project root), so the app works without any setup: open the project in
-Android Studio, sync Gradle and run. It is a free-plan key (about 60 requests
-per minute in total); if it were exhausted by very heavy use, just wait a
-minute.
-
-To use your own key: create a free account at <https://finnhub.io>, copy the
-API key and add this line to the `local.properties` file in the root (Android
-Studio creates it; it takes priority over `finnhub.properties`):
+Add this line to the `local.properties` file in the project root (Android
+Studio creates it; if it does not exist, create it):
 
 ```
 FINNHUB_API_KEY=your_key
 ```
 
+The author's key comes in `secretos.txt`. To use your own, a free account at
+<https://finnhub.io> is enough. The free plan allows about 60 requests per
+minute in total; if it were exhausted by very heavy use, just wait a minute.
 With no key at all, the app starts but the quotes show the error message with
 the "Reintentar" (retry) button.
 
 ### 5.2 Firebase
 
-The `app/google-services.json` file is already included and points to the
-author's Firebase project (with email Authentication and Firestore enabled).
-Nothing needs to be changed to try the app.
+The `app/google-services.json` file is not in the repository either: its
+content comes in `secretos.txt` and must be saved with that name in the `app`
+folder. It points to the author's Firebase project (with email Authentication
+and Firestore enabled and the rules published), so nothing else needs to be
+changed to try the app.
 
 To use your own Firebase project:
 
@@ -158,7 +161,8 @@ To use your own Firebase project:
 2. Enable Authentication > Email/Password.
 3. Create a Firestore database and publish the rules of `firestore.rules`
    (Firestore > Rules).
-4. Replace `app/google-services.json` with the downloaded one.
+4. Save the downloaded `google-services.json` in the `app` folder.
+
 
 ## 6. Architecture
 
@@ -238,13 +242,13 @@ Video: <https://youtube.com/shorts/40HL-BrREWs?is=Omns7hczNkWqOJ2L>
 ## 9. Delivery
 
 To generate the zip without the unnecessary files (`.gradle`, `.idea`, `build`,
-`.kotlin`, `.git` and `local.properties`, which holds paths of the author's
-machine), from the project root and with PowerShell 7:
+`.kotlin`, `.git`) or the secrets (`local.properties`, `google-services.json`,
+`secretos.txt`), from the project root and with PowerShell 7:
 
 ```
 pwsh scripts/crear-zip.ps1
 ```
 
-It creates `tech-watch.zip` on the Desktop, with the `LÉEME.txt` file, the
-`capturas/` folder, `finnhub.properties` (Finnhub key) and
-`app/google-services.json` (the author's Firebase project).
+It creates `tech-watch.zip` on the Desktop, with the `LÉEME.txt` file and the
+`capturas/` folder. The `secretos.txt` file is delivered separately to the
+professor.

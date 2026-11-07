@@ -130,33 +130,36 @@ una gráfica, estadísticas y una comparación entre sectores.
   - Android Studio reciente, con JDK 17 o superior (el que incluye Android Studio).
   - Dispositivo o emulador con Android 8.0 (API 26) o superior y conexión a
     Internet.
-  - Una clave gratuita de Finnhub (incluida en el zip; ver apartado siguiente).
+  - Los secretos del proyecto (clave de Finnhub y configuración de Firebase),
+    que se entregan aparte en secretos.txt: ver apartado 5.
 
 
 5. CONFIGURACIÓN
 ----------------
+Las credenciales NO están en el repositorio ni en su historial. Se entregan
+aparte en el fichero secretos.txt (ignorado por git), que contiene todo lo
+necesario y los pasos a seguir. En resumen:
+
 5.1 Clave de la API de Finnhub
 
-  El zip incluye una clave gratuita del autor en el fichero finnhub.properties
-  (raíz del proyecto), así que la aplicación funciona sin configurar nada:
-  abrir el proyecto en Android Studio, sincronizar Gradle y ejecutar. Es una
-  clave del plan gratuito (unas 60 peticiones por minuto en total); si se
-  agotara por un uso muy intenso, basta esperar un minuto.
-
-  Para usar una clave propia: crear una cuenta gratuita en https://finnhub.io,
-  copiar la API key y añadir esta línea al fichero local.properties de la raíz
-  (lo crea Android Studio; tiene prioridad sobre finnhub.properties):
+  Añadir esta línea al fichero local.properties de la raíz del proyecto (lo
+  crea Android Studio; si no existe, crearlo):
 
     FINNHUB_API_KEY=tu_clave
 
-  Sin ninguna clave, la aplicación arranca pero las cotizaciones muestran el
-  mensaje de error con el botón "Reintentar".
+  La clave del autor viene en secretos.txt. Para usar una propia basta una
+  cuenta gratuita en https://finnhub.io. El plan gratuito permite unas 60
+  peticiones por minuto en total; si se agotara por un uso muy intenso, basta
+  esperar un minuto. Sin ninguna clave, la aplicación arranca pero las
+  cotizaciones muestran el mensaje de error con el botón "Reintentar".
 
 5.2 Firebase
 
-  El fichero app/google-services.json ya está incluido y apunta al proyecto de
-  Firebase del autor (con Authentication por email y Firestore activados). No
-  hace falta tocar nada para probar la aplicación.
+  El fichero app/google-services.json tampoco está en el repositorio: su
+  contenido viene en secretos.txt y hay que guardarlo con ese nombre en la
+  carpeta app. Apunta al proyecto de Firebase del autor (con Authentication
+  por email y Firestore activados y las reglas publicadas), así que no hace
+  falta tocar nada más para probar la aplicación.
 
   Si se quisiera usar un proyecto de Firebase propio:
     1. Crear el proyecto y registrar una app Android con el paquete
@@ -164,7 +167,7 @@ una gráfica, estadísticas y una comparación entre sectores.
     2. Activar Authentication > Correo electrónico/contraseña.
     3. Crear una base de datos de Firestore y publicar las reglas del fichero
        firestore.rules (Firestore > Reglas).
-    4. Sustituir app/google-services.json por el descargado.
+    4. Guardar el google-services.json descargado en la carpeta app.
 
 
 6. ARQUITECTURA
@@ -237,11 +240,10 @@ una gráfica, estadísticas y una comparación entre sectores.
 9. ENTREGA
 ----------
   Para generar el zip sin los ficheros innecesarios (.gradle, .idea, build,
-  .kotlin, .git y local.properties, que lleva rutas del equipo del autor),
-  desde la raíz del proyecto y con PowerShell 7:
+  .kotlin, .git) ni los secretos (local.properties, google-services.json,
+  secretos.txt), desde la raíz del proyecto y con PowerShell 7:
 
     pwsh scripts/crear-zip.ps1
 
-  Crea tech-watch.zip en el Escritorio, con este LÉEME.txt, la carpeta capturas/,
-  finnhub.properties (clave de Finnhub) y app/google-services.json (el proyecto
-  de Firebase del autor).
+  Crea tech-watch.zip en el Escritorio, con este LÉEME.txt y la carpeta
+  capturas/. El fichero secretos.txt se entrega aparte al profesor.
