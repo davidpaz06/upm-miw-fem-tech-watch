@@ -47,7 +47,9 @@ class WatchlistViewModel(
         }
     }
 
+    /** Ignored while a load is running, so a second pull cannot request the same quotes again. */
     fun refresh() {
+        if (_state.value.loading) return
         viewModelScope.launch { sync(symbols, forceRefresh = true) }
     }
 

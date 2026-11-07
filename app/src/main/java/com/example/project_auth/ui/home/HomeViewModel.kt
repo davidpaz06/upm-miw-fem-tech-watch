@@ -57,7 +57,11 @@ class HomeViewModel(
 
     fun selectSort(field: SortField) = _state.update { it.copy(sort = it.sort.select(field)) }
 
-    fun refresh() = load()
+    /** Ignored while a load is running: restarting it would cancel it and request the same quotes again. */
+    fun refresh() {
+        if (_state.value.loading) return
+        load()
+    }
 
     /**
      * Shows the locally saved quotes straight away, then replaces them with fresh ones.
