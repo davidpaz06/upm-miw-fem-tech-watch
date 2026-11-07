@@ -9,6 +9,17 @@ const val QUOTE_BATCH_SIZE = 10
 /** How many rows below the last visible one are already worth requesting. */
 const val QUOTE_LOOKAHEAD = 1
 
+/**
+ * How many rows to request now when [lastVisible] is the last row on screen: the visible ones plus
+ * [lookahead] more, so the next batch is not triggered at once. Before any row has been reported
+ * (a list that has just opened) it falls back to [default].
+ */
+fun eagerRowCount(
+    lastVisible: Int,
+    lookahead: Int = QUOTE_LOOKAHEAD,
+    default: Int = QUOTE_EAGER_COUNT,
+): Int = if (lastVisible < 0) default else lastVisible + 1 + lookahead
+
 /** Which of the stale symbols are requested now and which wait for their rows to be seen. */
 data class QuotePlan(val now: List<String>, val later: List<String>)
 

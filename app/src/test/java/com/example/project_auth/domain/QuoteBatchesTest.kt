@@ -66,6 +66,16 @@ class QuoteBatchesTest {
     }
 
     @Test
+    fun theEagerCountFollowsTheVisibleRows() {
+        assertEquals(10, eagerRowCount(lastVisible = -1))
+        assertEquals(7, eagerRowCount(lastVisible = 5))
+        // What it covers never reaches the lookahead of the next batch.
+        val eager = eagerRowCount(lastVisible = 5)
+        val waiting = rows.drop(eager).toSet()
+        assertTrue(nextQuoteBatch(rows, waiting, lastVisible = 5).isEmpty())
+    }
+
+    @Test
     fun nothingWaitingMeansNoBatch() {
         assertTrue(nextQuoteBatch(rows, emptySet(), lastVisible = 19).isEmpty())
     }

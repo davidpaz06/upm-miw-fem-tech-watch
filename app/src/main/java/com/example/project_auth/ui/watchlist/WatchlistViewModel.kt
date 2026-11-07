@@ -7,6 +7,7 @@ import com.example.project_auth.data.QuoteCache
 import com.example.project_auth.data.QuoteLoader
 import com.example.project_auth.data.StockRepository
 import com.example.project_auth.domain.Companies
+import com.example.project_auth.domain.eagerRowCount
 import com.example.project_auth.domain.nextQuoteBatch
 import com.example.project_auth.domain.planQuoteLoad
 import com.example.project_auth.ui.home.CompanyQuote
@@ -92,6 +93,7 @@ class WatchlistViewModel(
             stale = loader.staleOf(newSymbols, force),
             hasQuote = loader::hasQuote,
             all = _state.value.sort.field == SortField.PRICE,
+            eagerCount = eagerRowCount(lastVisible),
         )
         waiting = plan.later.toSet()
         publish(loading = plan.now.isNotEmpty())

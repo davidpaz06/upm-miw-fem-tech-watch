@@ -11,6 +11,7 @@ import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
 import com.example.project_auth.domain.Company
 import com.example.project_auth.domain.Sector
+import com.example.project_auth.domain.eagerRowCount
 import com.example.project_auth.domain.nextQuoteBatch
 import com.example.project_auth.domain.planQuoteLoad
 import kotlinx.coroutines.Job
@@ -120,6 +121,7 @@ class HomeViewModel(
             stale = loader.staleOf(symbols, force),
             hasQuote = loader::hasQuote,
             all = _state.value.sort.field == SortField.PRICE,
+            eagerCount = eagerRowCount(lastVisible),
         )
         waiting = plan.later.toSet()
         if (plan.now.isEmpty()) {
