@@ -2,6 +2,7 @@ package com.example.project_auth.data
 
 import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.QUOTE_FRESH_MILLIS
+import com.example.project_auth.domain.QUOTE_REFRESH_MIN_MILLIS
 
 /**
  * The quotes a screen is showing, in memory, with the device time each one was last fetched.
@@ -36,10 +37,14 @@ class QuoteLoader(
         }
     }
 
-    /** The symbols whose quote is older than the freshness limit, or all of them if [force] is set. */
+    /**
+     * The symbols whose quote is older than the freshness limit. With [force] (pull-to-refresh) the
+     * limit is much shorter, but not zero: a quote fetched seconds ago is not asked for again.
+     */
     fun staleOf(symbols: Collection<String>, force: Boolean = false): Set<String> {
         val current = now()
-        return symbols.filter { force || !isFresh(fetchedAt[it], current) }.toSet()
+        val limit = if (force) QUOTE_REFRESH_MIN_MILLIS else QUOTE_FRESH_MILLIS
+        return symbols.filter { !isFresh(fetchedAt[it], current, limit) }.toSet()
     }
 
     /**
@@ -70,6 +75,6 @@ class QuoteLoader(
     fun offlineSince(symbols: Collection<String>): Long? =
         symbols.filter { it in failed }.mapNotNull { fetchedAt[it] }.minOrNull()
 
-    private fun isFresh(fetched: Long?, current: Long): Boolean =
-        fetched != null && current - fetched in 0 until QUOTE_FRESH_MILLIS
+    private fun isFresh(fetched: Long?, current: Long, limit: Long): Boolean =
+        fetched != null && current - fetched in 0 until limit
 }

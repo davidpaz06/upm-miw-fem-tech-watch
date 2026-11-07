@@ -52,7 +52,17 @@ class QuoteLoaderTest {
         val loader = loader()
         loader.restore(listOf("A", "B", "C"))
         assertEquals(setOf("B", "C"), loader.staleOf(listOf("A", "B", "C")))
-        assertEquals(setOf("A", "B", "C"), loader.staleOf(listOf("A", "B", "C"), force = true))
+        // A pull-to-refresh asks again for anything older than 20 s, but not for a 5 s old quote.
+        assertEquals(setOf("B", "C"), loader.staleOf(listOf("A", "B", "C"), force = true))
+    }
+
+    @Test
+    fun aPullToRefreshSkipsQuotesFetchedSecondsAgo() {
+        saved["A"] = CachedQuote(quote(5.0), clock - 19_999)
+        saved["B"] = CachedQuote(quote(5.0), clock - 20_000)
+        val loader = loader()
+        loader.restore(listOf("A", "B"))
+        assertEquals(setOf("B"), loader.staleOf(listOf("A", "B"), force = true))
     }
 
     @Test
