@@ -1,5 +1,12 @@
 package com.example.project_auth.ui.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.EaseIn
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -23,6 +30,9 @@ import com.example.project_auth.ui.home.HomeScreen
 import com.example.project_auth.ui.settings.SettingsScreen
 import com.example.project_auth.ui.stats.StatsScreen
 import com.example.project_auth.ui.watchlist.WatchlistScreen
+
+private const val DRAWER_ENTER_MILLIS = 300
+private const val DRAWER_EXIT_MILLIS = 250
 
 object Routes {
     const val LOGIN = "login"
@@ -64,7 +74,12 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                 composable(Routes.REGISTER) {
                     RegisterScreen(onGoToLogin = { navController.popBackStack() })
                 }
-                composable(Routes.HOME) {
+                composable(
+                    route = Routes.HOME,
+                    // Home stays still underneath while Settings slides over it like a drawer.
+                    exitTransition = { if (targetState.destination.route == Routes.SETTINGS) ExitTransition.None else null },
+                    popEnterTransition = { if (initialState.destination.route == Routes.SETTINGS) EnterTransition.None else null },
+                ) {
                     HomeScreen(
                         onOpenWatchlist = { navController.navigate(Routes.WATCHLIST) },
                         onOpenStats = { navController.navigate(Routes.STATS) },
@@ -72,7 +87,11 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                         onOpenDetail = { detailSymbol = it },
                     )
                 }
-                composable(Routes.SETTINGS) {
+                composable(
+                    route = Routes.SETTINGS,
+                    enterTransition = { slideInHorizontally(tween(DRAWER_ENTER_MILLIS, easing = EaseOut)) { it } },
+                    popExitTransition = { slideOutHorizontally(tween(DRAWER_EXIT_MILLIS, easing = EaseIn)) { it } },
+                ) {
                     SettingsScreen(onBack = { navController.popBackStack() })
                 }
                 composable(Routes.STATS) {
