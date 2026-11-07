@@ -71,7 +71,7 @@ object Companies {
         Company("IT", "Gartner", Sector.CONSULTING),
         Company("CRAI", "CRA International", Sector.CONSULTING),
         Company("HURN", "Huron Consulting", Sector.CONSULTING),
-        Company("ICF", "ICF International", Sector.CONSULTING),
+        Company("ICFI", "ICF International", Sector.CONSULTING),
         Company("EXLS", "ExlService", Sector.CONSULTING),
         Company("EXPO", "Exponent", Sector.CONSULTING),
         Company("SAIC", "Science Applications (SAIC)", Sector.CONSULTING),
@@ -96,7 +96,7 @@ object Companies {
         Company("CRSR", "Corsair Gaming", Sector.HARDWARE),
         Company("MSI", "Motorola Solutions", Sector.HARDWARE),
         Company("ANET", "Arista Networks", Sector.HARDWARE),
-        Company("PSTG", "Pure Storage", Sector.HARDWARE),
+        Company("GLW", "Corning", Sector.HARDWARE),
         Company("KEYS", "Keysight Technologies", Sector.HARDWARE),
     )
 
