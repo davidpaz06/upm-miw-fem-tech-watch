@@ -13,6 +13,8 @@ import com.example.project_auth.domain.Company
 import com.example.project_auth.domain.Sector
 import com.example.project_auth.domain.nextQuoteBatch
 import com.example.project_auth.domain.planQuoteLoad
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,6 +54,9 @@ class HomeViewModel(
     /** Index, in the order the rows are shown, of the last row on screen. */
     private var lastVisible = -1
 
+    /** The wait before a sector switch fetches; flipping past a sector cancels it. */
+    private var settling: Job? = null
+
     init {
         load()
     }
@@ -60,6 +65,7 @@ class HomeViewModel(
         if (sector == _state.value.sector) return
         waiting = emptySet()
         lastVisible = -1
+        settling?.cancel()
         _state.update {
             it.copy(
                 sector = sector,
@@ -70,7 +76,7 @@ class HomeViewModel(
                 offlineSince = null,
             )
         }
-        load()
+        load(settle = true)
     }
 
     fun selectSort(field: SortField) {
@@ -100,8 +106,10 @@ class HomeViewModel(
      * wait in [waiting]. A quote fetched less than a minute ago is not asked for again unless
      * [force] is set (pull-to-refresh). Any symbol Finnhub cannot answer keeps its old quote, and
      * [HomeUiState.offlineSince] tells the UI that some of what it shows is old.
+     * With [settle] (a sector switch) the request waits a moment, so tabs flicked past quickly
+     * ask for nothing.
      */
-    private fun load(force: Boolean = false) {
+    private fun load(force: Boolean = false, settle: Boolean = false) {
         val sector = _state.value.sector
         val companies = Companies.bySector(sector)
         val symbols = companies.map { it.symbol }
@@ -125,10 +133,15 @@ class HomeViewModel(
                 items = if (symbols.any(loader::hasQuote)) itemsOf(companies) else state.items,
             )
         }
-        viewModelScope.launch {
-            saveSnapshots(loader.fetch(plan.now))
-            publish(sector, loading = false)
-            if (_state.value.sector == sector) fetchVisibleWaiting()
+        settling?.cancel()
+        settling = viewModelScope.launch {
+            if (settle) delay(SECTOR_SETTLE_MILLIS)
+            // Its own coroutine: leaving the sector now cancels only the wait, not requests under way.
+            viewModelScope.launch {
+                saveSnapshots(loader.fetch(plan.now))
+                publish(sector, loading = false)
+                if (_state.value.sector == sector) fetchVisibleWaiting()
+            }
         }
     }
 
@@ -183,5 +196,9 @@ class HomeViewModel(
     private fun saveSnapshots(quotes: Map<String, Quote>) {
         val snapshots = quotes.map { (symbol, quote) -> quote.toSnapshot(symbol) }
         viewModelScope.launch { firestore.saveSnapshots(snapshots) }
+    }
+
+    private companion object {
+        const val SECTOR_SETTLE_MILLIS = 300L
     }
 }
