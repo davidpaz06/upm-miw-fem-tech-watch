@@ -2,16 +2,17 @@ package com.example.project_auth.ui.watchlist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.project_auth.data.CachedQuote
 import com.example.project_auth.data.FirestoreRepository
 import com.example.project_auth.data.QuoteCache
+import com.example.project_auth.data.QuoteLoader
 import com.example.project_auth.data.StockRepository
-import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
-import com.example.project_auth.domain.isFresh
+import com.example.project_auth.domain.nextQuoteBatch
+import com.example.project_auth.domain.planQuoteLoad
 import com.example.project_auth.ui.home.CompanyQuote
 import com.example.project_auth.ui.home.SortField
 import com.example.project_auth.ui.home.SortOrder
+import com.example.project_auth.ui.home.sortedWith
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,67 +29,103 @@ data class WatchlistUiState(
 )
 
 class WatchlistViewModel(
-    private val repository: StockRepository = StockRepository(),
+    repository: StockRepository = StockRepository(),
     private val firestore: FirestoreRepository = FirestoreRepository(),
-    private val cache: QuoteCache = QuoteCache.instance,
+    cache: QuoteCache = QuoteCache.instance,
+    private val loader: QuoteLoader = QuoteLoader(repository::getQuotes, cache::load, cache::save),
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(WatchlistUiState())
     val state: StateFlow<WatchlistUiState> = _state.asStateFlow()
 
-    /** Fresh quotes fetched this session, so adding or removing a favourite only asks for what is missing. */
-    private val quotes = mutableMapOf<String, Quote>()
     private var symbols: Set<String> = emptySet()
+
+    /** Stale favourites whose request waits until their row is needed. */
+    private var waiting: Set<String> = emptySet()
+
+    /** Index, in the order the rows are shown, of the last row on screen. */
+    private var lastVisible = -1
 
     init {
         viewModelScope.launch {
             firestore.watchlistSymbols()
                 .catch { emit(emptySet()) }
-                .collectLatest { sync(it, forceRefresh = false) }
+                .collectLatest { sync(it, force = false) }
         }
     }
 
     /** Ignored while a load is running, so a second pull cannot request the same quotes again. */
     fun refresh() {
         if (_state.value.loading) return
-        viewModelScope.launch { sync(symbols, forceRefresh = true) }
+        viewModelScope.launch { sync(symbols, force = true) }
     }
 
     fun selectSort(field: SortField) {
         _state.value = _state.value.let { it.copy(sort = it.sort.select(field)) }
+        // Ordering by price compares every company, so it cannot wait for the rows to be seen.
+        if (_state.value.sort.field == SortField.PRICE) fetchWaiting(waiting.toList())
     }
 
     /**
-     * Shows fresh quotes where there are any and the locally saved ones otherwise, so the
-     * list is not empty while offline or while the first request is in flight.
+     * Called as the list scrolls. Once the rows being shown get close to the ones that wait, the
+     * next batch is requested. Ignored while a load is running; it is checked again when it ends.
      */
-    private suspend fun sync(newSymbols: Set<String>, forceRefresh: Boolean) {
+    fun onRowsVisible(lastVisibleIndex: Int) {
+        lastVisible = lastVisibleIndex
+        fetchVisibleWaiting()
+    }
+
+    /**
+     * Shows the quotes already known (saved on the device or fetched earlier) straight away, then
+     * asks for the stale ones: the first rows plus any row with no quote at all, and the rest
+     * wait in [waiting]. A quote fetched less than a minute ago is not asked for again unless
+     * [force] is set (pull-to-refresh).
+     */
+    private suspend fun sync(newSymbols: Set<String>, force: Boolean) {
         symbols = newSymbols
-        val cached = cache.load(newSymbols)
-        _state.value = _state.value.copy(items = itemsFor(newSymbols, cached), loading = true)
+        loader.restore(newSymbols)
+        val plan = planQuoteLoad(
+            displayOrder = displayOrder(),
+            stale = loader.staleOf(newSymbols, force),
+            hasQuote = loader::hasQuote,
+            all = _state.value.sort.field == SortField.PRICE,
+        )
+        waiting = plan.later.toSet()
+        publish(loading = plan.now.isNotEmpty())
+        if (plan.now.isEmpty()) return
 
-        // A quote saved less than a minute ago is reused unless the user pulled to refresh.
-        val now = System.currentTimeMillis()
-        fun isCurrent(symbol: String) = symbol in quotes || cached[symbol]?.isFresh(now) == true
-        val missing = newSymbols.filter { forceRefresh || !isCurrent(it) }
-        val fresh = repository.getQuotes(missing)
-            .mapNotNull { (symbol, result) -> result.getOrNull()?.let { symbol to it } }
-            .toMap()
-        quotes += fresh
-        cache.save(fresh)
+        loader.fetch(plan.now)
+        publish(loading = false)
+        fetchVisibleWaiting()
+    }
 
+    private fun fetchVisibleWaiting() {
+        if (_state.value.loading || waiting.isEmpty()) return
+        fetchWaiting(nextQuoteBatch(displayOrder(), waiting, lastVisible))
+    }
+
+    private fun fetchWaiting(batch: List<String>) {
+        if (batch.isEmpty()) return
+        waiting -= batch.toSet()
+        viewModelScope.launch {
+            loader.fetch(batch)
+            publish()
+        }
+    }
+
+    private fun publish(loading: Boolean? = null) {
         _state.value = _state.value.copy(
-            items = itemsFor(newSymbols, cached),
-            loading = false,
-            offlineSince = newSymbols
-                .filter { it !in quotes && cached[it]?.isFresh(now) != true }
-                .mapNotNull { cached[it]?.savedAt }
-                .minOrNull(),
+            items = items(),
+            loading = loading ?: _state.value.loading,
+            offlineSince = loader.offlineSince(symbols),
         )
     }
 
-    private fun itemsFor(symbols: Set<String>, cached: Map<String, CachedQuote>): List<CompanyQuote> =
+    private fun items(): List<CompanyQuote> =
         symbols.sorted().mapNotNull { symbol ->
-            Companies.find(symbol)?.let { CompanyQuote(it, quotes[symbol] ?: cached[symbol]?.quote) }
+            Companies.find(symbol)?.let { CompanyQuote(it, loader.quoteOf(symbol)) }
         }
+
+    private fun displayOrder(): List<String> =
+        items().sortedWith(_state.value.sort).map { it.company.symbol }
 }
