@@ -17,8 +17,13 @@ class ApiKeyInterceptor(private val apiKey: String) : Interceptor {
 object FinnhubClient {
     private const val BASE_URL = "https://finnhub.io/api/v1/"
 
+    // The free plan allows about 60 requests per minute; keep some headroom below it.
+    private const val MAX_REQUESTS_PER_MINUTE = 50
+    private const val WINDOW_MILLIS = 60_000L
+
     val service: FinnhubService by lazy {
         val httpClient = OkHttpClient.Builder()
+            .addInterceptor(ThrottleInterceptor(SlidingWindowThrottle(MAX_REQUESTS_PER_MINUTE, WINDOW_MILLIS)))
             .addInterceptor(ApiKeyInterceptor(BuildConfig.FINNHUB_API_KEY))
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC))
             .build()
