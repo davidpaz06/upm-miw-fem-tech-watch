@@ -7,6 +7,7 @@ enum class Sector(@StringRes val label: Int) {
     CLOUD(R.string.sector_cloud),
     AI(R.string.sector_ai),
     CONSULTING(R.string.sector_consulting),
+    HARDWARE(R.string.sector_hardware),
 }
 
 data class Company(val symbol: String, val name: String, val sector: Sector)
@@ -32,6 +33,14 @@ object Companies {
         Company("FCN", "FTI Consulting", Sector.CONSULTING),
         Company("GLOB", "Globant", Sector.CONSULTING),
         Company("EPAM", "EPAM Systems", Sector.CONSULTING),
+
+        // Samsung is not offered by Finnhub's free plan; Google and Microsoft are already in Cloud.
+        Company("AAPL", "Apple", Sector.HARDWARE),
+        Company("DELL", "Dell Technologies", Sector.HARDWARE),
+        Company("HPQ", "HP Inc.", Sector.HARDWARE),
+        Company("SONY", "Sony", Sector.HARDWARE),
+        Company("LNVGY", "Lenovo", Sector.HARDWARE),
+        Company("XIACF", "Xiaomi", Sector.HARDWARE),
     )
 
     fun bySector(sector: Sector): List<Company> = all.filter { it.sector == sector }

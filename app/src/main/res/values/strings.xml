@@ -13,6 +13,7 @@
     <string name="sector_cloud">Cloud</string>
     <string name="sector_ai">IA</string>
     <string name="sector_consulting">Consultoría</string>
+    <string name="sector_hardware">Hardware</string>
 
     <string name="quote_unavailable">No disponible</string>
     <string name="home_error">No se pudieron cargar las cotizaciones. Revisa tu conexión y tu clave de Finnhub.</string>
