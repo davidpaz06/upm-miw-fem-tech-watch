@@ -18,6 +18,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,6 +27,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.project_auth.R
 import com.example.project_auth.ui.common.StaleDataBanner
 import com.example.project_auth.ui.home.QuoteRow
+import com.example.project_auth.ui.home.SortBar
+import com.example.project_auth.ui.home.sortedWith
 
 @Composable
 fun WatchlistScreen(
@@ -35,6 +38,7 @@ fun WatchlistScreen(
     viewModel: WatchlistViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    val sortedItems = remember(state.items, state.sort) { state.items.sortedWith(state.sort) }
 
     Column(modifier.fillMaxSize()) {
         Row(
@@ -51,6 +55,9 @@ fun WatchlistScreen(
             )
         }
         state.offlineSince?.let { StaleDataBanner(it) }
+        if (state.items.isNotEmpty()) {
+            SortBar(order = state.sort, onSelect = viewModel::selectSort)
+        }
         PullToRefreshBox(
             isRefreshing = state.loading && state.items.isNotEmpty(),
             onRefresh = viewModel::refresh,
@@ -75,7 +82,7 @@ fun WatchlistScreen(
                 }
 
                 else -> LazyColumn(Modifier.fillMaxSize()) {
-                    items(state.items, key = { it.company.symbol }) { item ->
+                    items(sortedItems, key = { it.company.symbol }) { item ->
                         QuoteRow(
                             item = item,
                             isFavourite = true,

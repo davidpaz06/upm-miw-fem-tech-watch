@@ -9,6 +9,8 @@ import com.example.project_auth.data.StockRepository
 import com.example.project_auth.data.remote.Quote
 import com.example.project_auth.domain.Companies
 import com.example.project_auth.ui.home.CompanyQuote
+import com.example.project_auth.ui.home.SortField
+import com.example.project_auth.ui.home.SortOrder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +23,7 @@ data class WatchlistUiState(
     val loading: Boolean = true,
     /** Device time (epoch millis) of the oldest saved quote shown instead of a fresh one. */
     val offlineSince: Long? = null,
+    val sort: SortOrder = SortOrder(),
 )
 
 class WatchlistViewModel(
@@ -48,6 +51,10 @@ class WatchlistViewModel(
         viewModelScope.launch { sync(symbols, forceRefresh = true) }
     }
 
+    fun selectSort(field: SortField) {
+        _state.value = _state.value.let { it.copy(sort = it.sort.select(field)) }
+    }
+
     fun remove(symbol: String) {
         viewModelScope.launch { firestore.removeFromWatchlist(symbol) }
     }
@@ -68,7 +75,7 @@ class WatchlistViewModel(
         quotes += fresh
         cache.save(fresh)
 
-        _state.value = WatchlistUiState(
+        _state.value = _state.value.copy(
             items = itemsFor(newSymbols, cached),
             loading = false,
             offlineSince = newSymbols
