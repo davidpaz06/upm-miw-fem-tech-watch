@@ -5,12 +5,17 @@ Autenticación, persistencia y conexión con servicios remotos (FEM, ejercicio 2
 1. DESCRIPCIÓN
 --------------
 Tech Watch es una aplicación Android para seguir la cotización en bolsa de las
-principales empresas tecnológicas, agrupadas en cuatro sectores:
+principales empresas tecnológicas, agrupadas en cuatro sectores de 20 empresas
+cada uno (80 en total):
 
-  - Cloud:       MSFT, AMZN, GOOGL, ORCL, SNOW
-  - IA:          NVDA, AMD, PLTR, META
-  - Consultoría: ACN, IBM, CTSH, INFY, BAH, FCN, GLOB, EPAM
-  - Hardware:    AAPL, DELL, HPQ, SONY, LNVGY (Lenovo), XIACF (Xiaomi)
+  - Cloud (20):       MSFT, AMZN, GOOGL, ORCL, SNOW, CRM, NOW, ADBE, WDAY, DDOG,
+                      NET, MDB, ZS, CRWD, TEAM, TWLO, PANW, OKTA, HUBS, SHOP
+  - IA (20):          NVDA, AMD, PLTR, META, AVGO, TSM, SMCI, ARM, MU, INTC,
+                      QCOM, MRVL, AI, SOUN, PATH, SNPS, CDNS, VRT, CRWV, APP
+  - Consultoría (20): ACN, IBM, CTSH, INFY, BAH, FCN, GLOB, EPAM, WIT, G, DXC,
+                      KD, IT, CRAI, HURN, ICF, EXLS, EXPO, SAIC, CACI
+  - Hardware (20):    AAPL, DELL, HPQ, SONY, LNVGY, XIACF, HPE, LOGI, GRMN, NTAP,
+                      WDC, STX, CSCO, ZBRA, SONO, CRSR, MSI, ANET, PSTG, KEYS
 
   Deloitte, EY, PwC, KPMG y McKinsey no aparecen porque son firmas privadas y no
   cotizan en bolsa. Samsung tampoco: cotiza en Corea y el plan gratuito de
@@ -172,6 +177,10 @@ una gráfica, estadísticas y una comparación entre sectores.
   - Plan gratuito de Finnhub: límite de peticiones por minuto y cobertura
     limitada de bolsas. Por eso se eligieron empresas cotizadas en EE. UU.
     (Infosys se usa a través de su ADR, INFY).
+  - Límite de peticiones: con 20 empresas por sector, cargar los cuatro sectores
+    supera las ~60 peticiones por minuto del plan gratuito. La aplicación espacia
+    sus llamadas (máximo 50 por minuto), así que si se recorren los sectores muy
+    deprisa, la carga puede tardar unos segundos en completarse.
   - Los precios están en dólares y pueden tener retraso respecto al mercado.
   - El historial depende de las consultas que haga cada usuario.
   - Esta aplicación es un ejercicio académico; no ofrece asesoramiento financiero.
