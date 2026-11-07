@@ -13,9 +13,9 @@ cada uno (80 en total):
   - IA (20):          NVDA, AMD, PLTR, META, AVGO, TSM, SMCI, ARM, MU, INTC,
                       QCOM, MRVL, AI, SOUN, PATH, SNPS, CDNS, VRT, CRWV, APP
   - Consultoría (20): ACN, IBM, CTSH, INFY, BAH, FCN, GLOB, EPAM, WIT, G, DXC,
-                      KD, IT, CRAI, HURN, ICF, EXLS, EXPO, SAIC, CACI
+                      KD, IT, CRAI, HURN, ICFI, EXLS, EXPO, SAIC, CACI
   - Hardware (20):    AAPL, DELL, HPQ, SONY, LNVGY, XIACF, HPE, LOGI, GRMN, NTAP,
-                      WDC, STX, CSCO, ZBRA, SONO, CRSR, MSI, ANET, PSTG, KEYS
+                      WDC, STX, CSCO, ZBRA, SONO, CRSR, MSI, ANET, GLW, KEYS
 
   Deloitte, EY, PwC, KPMG y McKinsey no aparecen porque son firmas privadas y no
   cotizan en bolsa. Samsung tampoco: cotiza en Corea y el plan gratuito de
@@ -39,6 +39,17 @@ una gráfica, estadísticas y una comparación entre sectores.
                   y OkHttp:
                     GET /quote            precio actual, variación, máximo, mínimo
                     GET /stock/profile2   nombre, logo, bolsa, industria, capitalización
+
+  Histórico       Finnhub no ofrece velas históricas en el plan gratuito, así que
+                  los precios pasados se piden a la API de gráficos de Yahoo
+                  Finance (sin clave, no oficial): cierres diarios, las últimas
+                  50 entradas. Al abrir el detalle de una empresa se consulta,
+                  se dibuja la gráfica con esa respuesta y después se actualiza
+                  Firestore con los días que faltan.
+
+  Tipos de cambio API de open.er-api.com (sin clave): tipos respecto al dólar,
+                  para convertir la capitalización. Datos de Exchange Rate API
+                  (https://www.exchangerate-api.com).
 
   Persistencia    Cloud Firestore. Cada consulta se guarda por usuario, de modo que
                   el historial y las estadísticas son privados de cada cuenta.
@@ -82,7 +93,9 @@ una gráfica, estadísticas y una comparación entre sectores.
     desde abajo (animación suave, 90% de la pantalla) sobre un fondo oscurecido.
     Se cierra con la X, tocando fuera o con el gesto de atrás. Muestra logo y
     perfil de la empresa, gráfica de precios, estadísticas (máximo, mínimo,
-    media, variación total) y la lista de consultas guardadas.
+    media, variación total) y la lista de los últimos 50 días de cierre. La
+    capitalización se muestra en dólares y, si la empresa cotiza en otra
+    moneda, también el importe original y el tipo de cambio usado.
   - Estadísticas: variación media acumulada de cada sector.
 
   Nota sobre los datos: el historial lo construye la propia aplicación con las
@@ -182,5 +195,13 @@ una gráfica, estadísticas y una comparación entre sectores.
     sus llamadas (máximo 50 por minuto), así que si se recorren los sectores muy
     deprisa, la carga puede tardar unos segundos en completarse.
   - Los precios están en dólares y pueden tener retraso respecto al mercado.
-  - El historial depende de las consultas que haga cada usuario.
+  - Todos los precios están en dólares: las 80 empresas cotizan en EE. UU. (o
+    como ADR u OTC) y Finnhub y Yahoo los dan en esa moneda. Solo la
+    capitalización llega en moneda local (TWD, INR, JPY, HKD, CHF), y se
+    convierte a dólares. Finnhub la da en la moneda de la bolsa de origen,
+    que se deduce de la bolsa porque su campo "currency" es la moneda de
+    reporte y no coincide en Lenovo, Xiaomi ni Logitech.
+  - El histórico usa un endpoint no oficial de Yahoo Finance, que puede
+    cambiar o limitar peticiones. Si falla, el detalle muestra lo que ya hay
+    guardado en Firestore.
   - Esta aplicación es un ejercicio académico; no ofrece asesoramiento financiero.
