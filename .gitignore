@@ -16,3 +16,8 @@ local.properties
 /app/build
 .kotlin
 /.idea
+
+# Credentials: shared with the professor in secretos.txt, never committed
+secretos.txt
+finnhub.properties
+/app/google-services.json

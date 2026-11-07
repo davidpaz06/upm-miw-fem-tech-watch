@@ -6,12 +6,9 @@ plugins {
     alias(libs.plugins.google.services)
 }
 
-// finnhub.properties travels with the project; local.properties is read after it and overrides it.
 val localProperties = Properties().apply {
-    listOf("finnhub.properties", "local.properties").forEach { name ->
-        val file = rootProject.file(name)
-        if (file.exists()) file.inputStream().use { load(it) }
-    }
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
 }
 
 android {
