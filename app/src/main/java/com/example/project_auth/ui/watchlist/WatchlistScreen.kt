@@ -13,7 +13,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.project_auth.R
+import com.example.project_auth.ui.common.BackButton
 import com.example.project_auth.ui.common.StaleDataBanner
 import com.example.project_auth.ui.home.QuoteRow
 import com.example.project_auth.ui.home.SortBar
@@ -44,11 +44,11 @@ fun WatchlistScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+            BackButton(onClick = onBack)
             Text(
                 stringResource(R.string.watchlist_title),
                 style = MaterialTheme.typography.titleLarge,

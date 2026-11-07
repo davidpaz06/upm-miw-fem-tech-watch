@@ -13,7 +13,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.example.project_auth.R
+import com.example.project_auth.ui.common.BackButton
 import com.example.project_auth.data.AuthRepository
 import com.example.project_auth.data.ThemeMode
 import com.example.project_auth.data.ThemeSettings
@@ -45,11 +45,11 @@ fun SettingsScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            TextButton(onClick = onBack) { Text(stringResource(R.string.back)) }
+            BackButton(onClick = onBack)
             Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.titleLarge)
         }
 
