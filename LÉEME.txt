@@ -60,6 +60,11 @@ una gráfica, estadísticas y una comparación entre sectores.
     almacenamiento interno de la aplicación (carpeta files/logos); las siguientes
     veces se lee del disco sin conexión. Mientras no está disponible se muestra
     la inicial del símbolo.
+  - Ordenación: en Home y en Favoritos se puede ordenar por nombre de empresa
+    (no por símbolo) o por precio actual, de forma ascendente o descendente. Se
+    pulsa el criterio activo para invertir el sentido. La ordenación se hace en
+    la aplicación, sobre los datos ya cargados, no en la consulta. Las empresas
+    sin cotización disponible quedan siempre al final.
   - Favoritos: la estrella de cada fila añade o quita la empresa de la lista del
     usuario, que se sincroniza con Firestore.
   - Historial por empresa: al tocar una fila se abre su detalle con logo y perfil
