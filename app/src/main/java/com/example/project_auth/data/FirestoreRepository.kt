@@ -20,34 +20,35 @@ class FirestoreRepository(
     )
 
     /**
-     * The document id is derived from the quote time, so fetching the same quote
-     * twice (for example when the market is closed) overwrites instead of duplicating.
+     * One document per symbol and day (see [documentId]): saving the same day again, from a
+     * quote or from the price history, overwrites it instead of adding another entry.
      */
     suspend fun saveSnapshots(snapshots: List<QuoteSnapshot>): Result<Unit> = runCatching {
         if (snapshots.isEmpty()) return@runCatching
         val quotes = userDocument().collection(QUOTES)
         val batch = db.batch()
-        snapshots.forEach { batch.set(quotes.document("${it.symbol}_${it.timestamp}"), it) }
+        snapshots.forEach { batch.set(quotes.document(it.documentId()), it) }
         batch.commit().await()
     }
 
     /**
      * Filters by symbol only and sorts here, because combining a filter and an order
-     * on different fields would need a composite index in Firestore.
+     * on different fields would need a composite index in Firestore. Entries saved before
+     * documents were per day can leave two for one day, so only the latest of each is kept.
      */
     suspend fun getSnapshots(symbol: String): Result<List<QuoteSnapshot>> = runCatching {
         userDocument().collection(QUOTES)
             .whereEqualTo("symbol", symbol)
             .get().await()
             .toObjects(QuoteSnapshot::class.java)
-            .sortedBy { it.timestamp }
+            .latestPerDay()
     }
 
     suspend fun getAllSnapshots(): Result<List<QuoteSnapshot>> = runCatching {
         userDocument().collection(QUOTES)
             .get().await()
             .toObjects(QuoteSnapshot::class.java)
-            .sortedBy { it.timestamp }
+            .latestPerDay()
     }
 
     /** Emits the favourite symbols now and again after every change. */
