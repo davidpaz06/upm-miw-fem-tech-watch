@@ -64,6 +64,18 @@ object Companies {
         Company("FCN", "FTI Consulting", Sector.CONSULTING),
         Company("GLOB", "Globant", Sector.CONSULTING),
         Company("EPAM", "EPAM Systems", Sector.CONSULTING),
+        Company("WIT", "Wipro", Sector.CONSULTING),
+        Company("G", "Genpact", Sector.CONSULTING),
+        Company("DXC", "DXC Technology", Sector.CONSULTING),
+        Company("KD", "Kyndryl", Sector.CONSULTING),
+        Company("IT", "Gartner", Sector.CONSULTING),
+        Company("CRAI", "CRA International", Sector.CONSULTING),
+        Company("HURN", "Huron Consulting", Sector.CONSULTING),
+        Company("ICF", "ICF International", Sector.CONSULTING),
+        Company("EXLS", "ExlService", Sector.CONSULTING),
+        Company("EXPO", "Exponent", Sector.CONSULTING),
+        Company("SAIC", "Science Applications (SAIC)", Sector.CONSULTING),
+        Company("CACI", "CACI International", Sector.CONSULTING),
 
         // Samsung is not offered by Finnhub's free plan; Google and Microsoft are already in Cloud.
         Company("AAPL", "Apple", Sector.HARDWARE),
