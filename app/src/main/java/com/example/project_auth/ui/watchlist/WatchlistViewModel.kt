@@ -55,10 +55,6 @@ class WatchlistViewModel(
         _state.value = _state.value.let { it.copy(sort = it.sort.select(field)) }
     }
 
-    fun remove(symbol: String) {
-        viewModelScope.launch { firestore.removeFromWatchlist(symbol) }
-    }
-
     /**
      * Shows fresh quotes where there are any and the locally saved ones otherwise, so the
      * list is not empty while offline or while the first request is in flight.

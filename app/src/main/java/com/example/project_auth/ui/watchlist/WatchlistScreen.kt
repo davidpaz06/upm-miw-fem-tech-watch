@@ -85,8 +85,6 @@ fun WatchlistScreen(
                     items(sortedItems, key = { it.company.symbol }) { item ->
                         QuoteRow(
                             item = item,
-                            isFavourite = true,
-                            onToggleFavourite = { viewModel.remove(item.company.symbol) },
                             onClick = { onOpenDetail(item.company.symbol) },
                         )
                         HorizontalDivider()

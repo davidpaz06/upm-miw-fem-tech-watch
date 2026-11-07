@@ -109,8 +109,6 @@ fun HomeScreen(
                     items(sortedItems, key = { it.company.symbol }) { item ->
                         QuoteRow(
                             item = item,
-                            isFavourite = item.company.symbol in state.watchlist,
-                            onToggleFavourite = { viewModel.toggleWatchlist(item.company.symbol) },
                             onClick = { onOpenDetail(item.company.symbol) },
                         )
                         HorizontalDivider()

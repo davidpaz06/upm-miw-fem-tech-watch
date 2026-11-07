@@ -14,7 +14,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -26,7 +25,6 @@ data class HomeUiState(
     val items: List<CompanyQuote> = emptyList(),
     val loading: Boolean = false,
     val loaded: Boolean = false,
-    val watchlist: Set<String> = emptySet(),
     /** Device time (epoch millis) of the oldest saved quote being shown instead of a fresh one. */
     val offlineSince: Long? = null,
     val sort: SortOrder = SortOrder(),
@@ -47,11 +45,6 @@ class HomeViewModel(
 
     init {
         load()
-        viewModelScope.launch {
-            firestore.watchlistSymbols()
-                .catch { emit(emptySet()) }
-                .collect { symbols -> _state.update { it.copy(watchlist = symbols) } }
-        }
     }
 
     fun selectSector(sector: Sector) {
@@ -63,16 +56,6 @@ class HomeViewModel(
     }
 
     fun selectSort(field: SortField) = _state.update { it.copy(sort = it.sort.select(field)) }
-
-    fun toggleWatchlist(symbol: String) {
-        viewModelScope.launch {
-            if (symbol in _state.value.watchlist) {
-                firestore.removeFromWatchlist(symbol)
-            } else {
-                firestore.addToWatchlist(symbol)
-            }
-        }
-    }
 
     fun refresh() = load()
 
