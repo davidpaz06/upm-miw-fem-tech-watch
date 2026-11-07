@@ -30,6 +30,8 @@ una gráfica, estadísticas y una comparación entre sectores.
 
   Persistencia    Cloud Firestore. Cada consulta se guarda por usuario, de modo que
                   el historial y las estadísticas son privados de cada cuenta.
+                  Adicionalmente hay persistencia local: última cotización de cada
+                  empresa (SharedPreferences) y logos (almacenamiento interno).
                   Las reglas de seguridad (firestore.rules) impiden que un usuario
                   lea o escriba datos de otro.
 
@@ -41,6 +43,11 @@ una gráfica, estadísticas y una comparación entre sectores.
     español.
   - Panel de cotizaciones por sector (pestañas Cloud / IA / Consultoría), con
     precio y variación diaria en verde o rojo. Se recarga deslizando hacia abajo.
+  - Uso sin conexión: la última cotización de cada empresa se guarda también en
+    el dispositivo (SharedPreferences). Al abrir la aplicación se muestran
+    primero esos datos guardados y después se refrescan; si Finnhub no responde,
+    se mantienen y un aviso indica de cuándo son. El historial y las estadísticas
+    usan la caché local de Firestore.
   - Logos: cada empresa muestra su logo en el listado y en el detalle. Se
     descarga una sola vez, la primera vez que se necesita, y se guarda en el
     almacenamiento interno de la aplicación (carpeta files/logos); las siguientes
