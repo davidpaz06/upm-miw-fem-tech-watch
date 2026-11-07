@@ -60,19 +60,24 @@ una gráfica, estadísticas y una comparación entre sectores.
     almacenamiento interno de la aplicación (carpeta files/logos); las siguientes
     veces se lee del disco sin conexión. Mientras no está disponible se muestra
     la inicial del símbolo.
-  - Modo claro / oscuro: el botón ☾ / ☀ de la cabecera de Home alterna entre
-    ambos temas. La elección se guarda en el dispositivo; mientras no se use, la
+  - Ajustes: el botón con el icono de engranaje de Home (a la derecha) abre una
+    pantalla con el correo de la cuenta, un interruptor de modo oscuro y el
+    botón rojo "Cerrar sesión". El modo oscuro se aplica con una transición
+    suave y la elección se guarda en el dispositivo; mientras no se use, la
     aplicación sigue el modo del sistema.
   - Ordenación: en Home y en Favoritos se puede ordenar por nombre de empresa
     (no por símbolo) o por precio actual, de forma ascendente o descendente. Se
     pulsa el criterio activo para invertir el sentido. La ordenación se hace en
     la aplicación, sobre los datos ya cargados, no en la consulta. Las empresas
     sin cotización disponible quedan siempre al final.
-  - Favoritos: la estrella de cada fila añade o quita la empresa de la lista del
-    usuario, que se sincroniza con Firestore.
-  - Historial por empresa: al tocar una fila se abre su detalle con logo y perfil
-    de la empresa, gráfica de precios, estadísticas (máximo, mínimo, media,
-    variación total) y la lista de consultas guardadas.
+  - Favoritos: la estrella de la cabecera del detalle de cada empresa la añade o
+    la quita de la lista del usuario, que se sincroniza con Firestore. El botón
+    "Favoritos" de Home muestra esa lista.
+  - Detalle de empresa: al tocar una fila se abre como ventana modal que sube
+    desde abajo (animación suave, 90% de la pantalla) sobre un fondo oscurecido.
+    Se cierra con la X, tocando fuera o con el gesto de atrás. Muestra logo y
+    perfil de la empresa, gráfica de precios, estadísticas (máximo, mínimo,
+    media, variación total) y la lista de consultas guardadas.
   - Estadísticas: variación media acumulada de cada sector.
 
   Nota sobre los datos: el historial lo construye la propia aplicación con las
@@ -148,6 +153,9 @@ una gráfica, estadísticas y una comparación entre sectores.
 
   Librerías: Navigation Compose, Retrofit + Gson, OkHttp (logging), Firebase Auth
   y Firestore, Coil (mostrar los logos guardados).
+
+  Iconos: Google Material Symbols (https://fonts.google.com/icons), licencia
+  Apache 2.0, incluidos como vectores en app/src/main/res/drawable (ic_*.xml).
 
   Pruebas unitarias (app/src/test): cálculo de estadísticas y comparación de
   sectores.  Se ejecutan con:  ./gradlew testDebugUnitTest
