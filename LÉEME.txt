@@ -5,11 +5,18 @@ Autenticación, persistencia y conexión con servicios remotos (FEM, ejercicio 2
 1. DESCRIPCIÓN
 --------------
 Tech Watch es una aplicación Android para seguir la cotización en bolsa de las
-principales empresas tecnológicas, agrupadas en tres sectores:
+principales empresas tecnológicas, agrupadas en cuatro sectores:
 
   - Cloud:       MSFT, AMZN, GOOGL, ORCL, SNOW
   - IA:          NVDA, AMD, PLTR, META
-  - Consultoría: ACN, IBM, CTSH, INFY
+  - Consultoría: ACN, IBM, CTSH, INFY, BAH, FCN, GLOB, EPAM
+  - Hardware:    AAPL, DELL, HPQ, SONY, LNVGY (Lenovo), XIACF (Xiaomi)
+
+  Deloitte, EY, PwC, KPMG y McKinsey no aparecen porque son firmas privadas y no
+  cotizan en bolsa. Samsung tampoco: cotiza en Corea y el plan gratuito de
+  Finnhub no da acceso a ese mercado. Lenovo y Xiaomi se consultan por sus
+  títulos extrabursátiles (OTC) de EE. UU., que se actualizan con menos
+  frecuencia.
 
 Cada vez que el usuario consulta un sector, la aplicación guarda en la nube el
 precio obtenido. Con esas consultas sucesivas construye un historial por empresa,
