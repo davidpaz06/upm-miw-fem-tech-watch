@@ -70,6 +70,15 @@ class HomeViewModel(
         if (_state.value.sort.field == SortField.PRICE) fetchWaiting(waiting.toList())
     }
 
+    /**
+     * Called whenever Home becomes visible again (coming back from another screen or the app).
+     * Asks only for what went stale in the meantime, so returning within a minute costs nothing.
+     */
+    fun onResume() {
+        if (_state.value.loading) return
+        load()
+    }
+
     /** Ignored while a load is running, so a second pull cannot request the same quotes again. */
     fun refresh() {
         if (_state.value.loading) return
