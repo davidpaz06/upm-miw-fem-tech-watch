@@ -17,12 +17,6 @@ cada uno (80 en total):
   - Hardware (20):    AAPL, DELL, HPQ, SONY, LNVGY, XIACF, HPE, LOGI, GRMN, NTAP,
                       WDC, STX, CSCO, ZBRA, SONO, CRSR, MSI, ANET, GLW, KEYS
 
-  Deloitte, EY, PwC, KPMG y McKinsey no aparecen porque son firmas privadas y no
-  cotizan en bolsa. Samsung tampoco: cotiza en Corea y el plan gratuito de
-  Finnhub no da acceso a ese mercado. Lenovo y Xiaomi se consultan por sus
-  títulos extrabursátiles (OTC) de EE. UU., que se actualizan con menos
-  frecuencia.
-
 Cada vez que el usuario consulta un sector, la aplicación guarda en la nube el
 precio obtenido. Con esas consultas sucesivas construye un historial por empresa,
 una gráfica, estadísticas y una comparación entre sectores.
@@ -60,7 +54,7 @@ una gráfica, estadísticas y una comparación entre sectores.
                   de cada empresa (SharedPreferences) y logos (almacenamiento
                   interno).
 
-  Utilidad        Seguimiento de 80 empresas tecnológicas en cuatro sectores, con
+  Utilidad        Seguimiento de 80 empresas tecnológicas en cuatro sectores tech, con
   y complejidad   ordenación, favoritos, detalle con gráfica y estadísticas,
                   comparación entre sectores, conversión de moneda, modo oscuro y
                   uso sin conexión (ver apartado 3).
@@ -221,7 +215,7 @@ una gráfica, estadísticas y una comparación entre sectores.
                            gráfica de los últimos 50 cierres, estadísticas e
                            historial; la estrella indica que es favorita.
     03-ajustes.png         Ajustes: cuenta, modo oscuro y cierre de sesión.
-  Vídeo:    [COMPLETAR: enlace al vídeo, o nombre del fichero si va en el zip]
+  Vídeo:    https://youtube.com/shorts/40HL-BrREWs?is=Omns7hczNkWqOJ2L
 
 
 8. LIMITACIONES CONOCIDAS
@@ -236,16 +230,9 @@ una gráfica, estadísticas y una comparación entre sectores.
     segundos. Si Finnhub llegara a rechazar peticiones (HTTP 429), la lista
     mantiene las cotizaciones guardadas y muestra el aviso de datos antiguos,
     que en ese caso habla de falta de conexión aunque sí la haya.
-  - Todos los precios están en dólares: las 80 empresas cotizan en EE. UU. (o
-    como ADR u OTC) y Finnhub y Yahoo los dan en esa moneda, con retraso
-    respecto al mercado. Solo la capitalización llega en moneda local (TWD, INR,
-    JPY, HKD, CHF), y se convierte a dólares. Finnhub la da en la moneda de la
-    bolsa de origen, que se deduce de la bolsa porque su campo "currency" es la
-    moneda de reporte y no coincide en Lenovo, Xiaomi ni Logitech.
   - El histórico usa un endpoint no oficial de Yahoo Finance, que puede
     cambiar o limitar peticiones. Si falla, el detalle muestra lo que ya hay
     guardado en Firestore.
-  - Esta aplicación es un ejercicio académico; no ofrece asesoramiento financiero.
 
 9. ENTREGA
 ----------
