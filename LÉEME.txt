@@ -70,12 +70,16 @@ una gráfica, estadísticas y una comparación entre sectores.
     el dispositivo (SharedPreferences). Al abrir la aplicación se muestran
     primero esos datos guardados y después se refrescan; si Finnhub no responde,
     se mantienen y un aviso indica de cuándo son. El historial y las estadísticas
-    usan la caché local de Firestore.
+    usan la caché local de Firestore. Para no pedir datos de más, las
+    cotizaciones guardadas hace menos de un minuto se reutilizan sin volver
+    a consultarlas al cambiar de pestaña; deslizar para actualizar siempre
+    consulta de nuevo.
   - Logos: cada empresa muestra su logo en el listado y en el detalle. Se
     descarga una sola vez, la primera vez que se necesita, y se guarda en el
     almacenamiento interno de la aplicación (carpeta files/logos); las siguientes
     veces se lee del disco sin conexión. Mientras no está disponible se muestra
-    la inicial del símbolo.
+    la inicial del símbolo. La descarga se hace en segundo plano, una sola vez
+    por empresa, y no se cancela si la fila sale de la pantalla al hacer scroll.
   - Ajustes: el botón con el icono de engranaje de Home (a la derecha) abre una
     pantalla con el correo de la cuenta, un interruptor de modo oscuro y el
     botón rojo "Cerrar sesión". El modo oscuro se aplica con una transición
