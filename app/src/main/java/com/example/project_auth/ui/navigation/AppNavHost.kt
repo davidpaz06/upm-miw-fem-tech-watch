@@ -19,12 +19,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.project_auth.data.AuthRepository
 import com.example.project_auth.ui.auth.LoginScreen
 import com.example.project_auth.ui.auth.RegisterScreen
+import com.example.project_auth.ui.common.ScreenSurface
 import com.example.project_auth.ui.history.StockDetailModal
 import com.example.project_auth.ui.home.HomeScreen
 import com.example.project_auth.ui.settings.SettingsScreen
@@ -33,6 +35,7 @@ import com.example.project_auth.ui.watchlist.WatchlistScreen
 
 private const val DRAWER_ENTER_MILLIS = 300
 private const val DRAWER_EXIT_MILLIS = 250
+private val DRAWER_SHADOW = 8.dp
 
 object Routes {
     const val LOGIN = "login"
@@ -68,11 +71,17 @@ fun AppNavHost(modifier: Modifier = Modifier) {
     Box(modifier.fillMaxSize()) {
         Scaffold(Modifier.fillMaxSize()) { innerPadding ->
             NavHost(navController, startDestination = startDestination, modifier = Modifier.padding(innerPadding)) {
+                // Every destination sits on an opaque ScreenSurface: the NavHost draws two screens
+                // during a transition and the Scaffold background is behind both of them.
                 composable(Routes.LOGIN) {
-                    LoginScreen(onGoToRegister = { navController.navigate(Routes.REGISTER) })
+                    ScreenSurface {
+                        LoginScreen(onGoToRegister = { navController.navigate(Routes.REGISTER) })
+                    }
                 }
                 composable(Routes.REGISTER) {
-                    RegisterScreen(onGoToLogin = { navController.popBackStack() })
+                    ScreenSurface {
+                        RegisterScreen(onGoToLogin = { navController.popBackStack() })
+                    }
                 }
                 composable(
                     route = Routes.HOME,
@@ -80,28 +89,37 @@ fun AppNavHost(modifier: Modifier = Modifier) {
                     exitTransition = { if (targetState.destination.route == Routes.SETTINGS) ExitTransition.None else null },
                     popEnterTransition = { if (initialState.destination.route == Routes.SETTINGS) EnterTransition.None else null },
                 ) {
-                    HomeScreen(
-                        onOpenWatchlist = { navController.navigate(Routes.WATCHLIST) },
-                        onOpenStats = { navController.navigate(Routes.STATS) },
-                        onOpenSettings = { navController.navigate(Routes.SETTINGS) },
-                        onOpenDetail = { detailSymbol = it },
-                    )
+                    ScreenSurface {
+                        HomeScreen(
+                            onOpenWatchlist = { navController.navigate(Routes.WATCHLIST) },
+                            onOpenStats = { navController.navigate(Routes.STATS) },
+                            onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                            onOpenDetail = { detailSymbol = it },
+                        )
+                    }
                 }
                 composable(
                     route = Routes.SETTINGS,
                     enterTransition = { slideInHorizontally(tween(DRAWER_ENTER_MILLIS, easing = EaseOut)) { it } },
                     popExitTransition = { slideOutHorizontally(tween(DRAWER_EXIT_MILLIS, easing = EaseIn)) { it } },
                 ) {
-                    SettingsScreen(onBack = { navController.popBackStack() })
+                    // The shadow marks the leading edge of the drawer while it slides over Home.
+                    ScreenSurface(shadowElevation = DRAWER_SHADOW) {
+                        SettingsScreen(onBack = { navController.popBackStack() })
+                    }
                 }
                 composable(Routes.STATS) {
-                    StatsScreen(onBack = { navController.popBackStack() })
+                    ScreenSurface {
+                        StatsScreen(onBack = { navController.popBackStack() })
+                    }
                 }
                 composable(Routes.WATCHLIST) {
-                    WatchlistScreen(
-                        onBack = { navController.popBackStack() },
-                        onOpenDetail = { detailSymbol = it },
-                    )
+                    ScreenSurface {
+                        WatchlistScreen(
+                            onBack = { navController.popBackStack() },
+                            onOpenDetail = { detailSymbol = it },
+                        )
+                    }
                 }
             }
         }
