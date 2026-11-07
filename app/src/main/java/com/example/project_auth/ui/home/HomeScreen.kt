@@ -21,6 +21,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,6 +43,7 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+    val sortedItems = remember(state.items, state.sort) { state.items.sortedWith(state.sort) }
 
     Column(modifier.fillMaxSize()) {
         Row(
@@ -80,6 +82,9 @@ fun HomeScreen(
             }
         }
         state.offlineSince?.let { StaleDataBanner(it) }
+        if (state.items.isNotEmpty()) {
+            SortBar(order = state.sort, onSelect = viewModel::selectSort)
+        }
         PullToRefreshBox(
             isRefreshing = state.loading && state.items.isNotEmpty(),
             onRefresh = viewModel::refresh,
@@ -108,7 +113,7 @@ fun HomeScreen(
                 }
 
                 else -> LazyColumn(Modifier.fillMaxSize()) {
-                    items(state.items, key = { it.company.symbol }) { item ->
+                    items(sortedItems, key = { it.company.symbol }) { item ->
                         QuoteRow(
                             item = item,
                             isFavourite = item.company.symbol in state.watchlist,

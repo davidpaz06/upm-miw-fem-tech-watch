@@ -29,6 +29,7 @@ data class HomeUiState(
     val watchlist: Set<String> = emptySet(),
     /** Device time (epoch millis) of the oldest saved quote being shown instead of a fresh one. */
     val offlineSince: Long? = null,
+    val sort: SortOrder = SortOrder(),
 ) {
     val failed: Boolean get() = loaded && items.none { it.quote != null }
 }
@@ -60,6 +61,8 @@ class HomeViewModel(
         }
         load()
     }
+
+    fun selectSort(field: SortField) = _state.update { it.copy(sort = it.sort.select(field)) }
 
     fun toggleWatchlist(symbol: String) {
         viewModelScope.launch {
