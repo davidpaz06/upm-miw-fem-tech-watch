@@ -23,6 +23,8 @@ import kotlinx.coroutines.launch
 data class WatchlistUiState(
     val items: List<CompanyQuote> = emptyList(),
     val loading: Boolean = true,
+    /** True only for a pull-to-refresh, so the indicator does not appear when the screen opens. */
+    val refreshing: Boolean = false,
     /** Device time (epoch millis) of the oldest saved quote shown instead of a fresh one. */
     val offlineSince: Long? = null,
     val sort: SortOrder = SortOrder(),
@@ -57,6 +59,7 @@ class WatchlistViewModel(
     /** Ignored while a load is running, so a second pull cannot request the same quotes again. */
     fun refresh() {
         if (_state.value.loading) return
+        _state.value = _state.value.copy(refreshing = true)
         viewModelScope.launch { sync(symbols, force = true) }
     }
 
@@ -117,6 +120,7 @@ class WatchlistViewModel(
         _state.value = _state.value.copy(
             items = items(),
             loading = loading ?: _state.value.loading,
+            refreshing = _state.value.refreshing && (loading ?: _state.value.loading),
             offlineSince = loader.offlineSince(symbols),
         )
     }

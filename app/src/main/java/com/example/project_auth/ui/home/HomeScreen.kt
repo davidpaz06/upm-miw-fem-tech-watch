@@ -80,7 +80,7 @@ fun HomeScreen(
             SortBar(order = state.sort, onSelect = viewModel::selectSort)
         }
         PullToRefreshBox(
-            isRefreshing = state.loading && state.items.isNotEmpty(),
+            isRefreshing = state.refreshing,
             onRefresh = viewModel::refresh,
             modifier = Modifier.fillMaxSize(),
         ) {

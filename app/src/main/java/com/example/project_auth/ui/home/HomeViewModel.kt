@@ -27,6 +27,8 @@ data class HomeUiState(
     val items: List<CompanyQuote> = emptyList(),
     val loading: Boolean = false,
     val loaded: Boolean = false,
+    /** True only for a pull-to-refresh, so the indicator does not appear when switching sectors. */
+    val refreshing: Boolean = false,
     /** Device time (epoch millis) of the oldest saved quote being shown instead of a fresh one. */
     val offlineSince: Long? = null,
     val sort: SortOrder = SortOrder(),
@@ -59,7 +61,14 @@ class HomeViewModel(
         waiting = emptySet()
         lastVisible = -1
         _state.update {
-            it.copy(sector = sector, items = emptyList(), loading = false, loaded = false, offlineSince = null)
+            it.copy(
+                sector = sector,
+                items = emptyList(),
+                loading = false,
+                refreshing = false,
+                loaded = false,
+                offlineSince = null,
+            )
         }
         load()
     }
@@ -112,6 +121,7 @@ class HomeViewModel(
         _state.update { state ->
             state.copy(
                 loading = true,
+                refreshing = force,
                 items = if (symbols.any(loader::hasQuote)) itemsOf(companies) else state.items,
             )
         }
@@ -157,6 +167,7 @@ class HomeViewModel(
             state.copy(
                 items = itemsOf(companies),
                 loading = loading ?: state.loading,
+                refreshing = state.refreshing && (loading ?: state.loading),
                 loaded = true,
                 offlineSince = loader.offlineSince(companies.map { it.symbol }),
             )
