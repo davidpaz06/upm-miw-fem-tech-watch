@@ -16,26 +16,26 @@ private const val THEME_TRANSITION_MILLIS = 400
 
 /**
  * Built from res/values/colors.xml, so that file is the one place the palette is defined:
- * orange for primary and the pills, amber for the warning banner and accents.
+ * green (NVIDIA-style) for primary and the pills, amber for the warning banner and accents.
  */
 @Composable
 private fun appColorScheme(darkTheme: Boolean): ColorScheme {
-    val orange200 = colorResource(R.color.orange_200)
-    val orange500 = colorResource(R.color.orange_500)
-    val orange700 = colorResource(R.color.orange_700)
+    val green200 = colorResource(R.color.green_200)
+    val green500 = colorResource(R.color.green_500)
+    val green700 = colorResource(R.color.green_700)
     val amber = colorResource(R.color.teal_200)
     val orange = colorResource(R.color.teal_700)
     val black = colorResource(R.color.black)
     val white = colorResource(R.color.white)
     return if (darkTheme) {
         darkColorScheme(
-            primary = orange200,
+            primary = green500,
             onPrimary = black,
-            primaryContainer = orange700,
+            primaryContainer = green700,
             onPrimaryContainer = white,
             secondary = amber,
             onSecondary = black,
-            secondaryContainer = orange700,
+            secondaryContainer = green700,
             onSecondaryContainer = white,
             tertiary = amber,
             onTertiary = black,
@@ -46,13 +46,13 @@ private fun appColorScheme(darkTheme: Boolean): ColorScheme {
         )
     } else {
         lightColorScheme(
-            primary = orange500,
-            onPrimary = white,
-            primaryContainer = orange200,
+            primary = green500,
+            onPrimary = black,
+            primaryContainer = green200,
             onPrimaryContainer = black,
             secondary = orange,
             onSecondary = black,
-            secondaryContainer = orange200,
+            secondaryContainer = green200,
             onSecondaryContainer = black,
             tertiary = amber,
             onTertiary = black,
