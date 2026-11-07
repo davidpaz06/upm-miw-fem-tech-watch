@@ -34,7 +34,8 @@ class HistoryViewModel(
     private val _state = MutableStateFlow(HistoryUiState())
     val state: StateFlow<HistoryUiState> = _state.asStateFlow()
 
-    init {
+    /** Reloads everything; called each time the detail is opened because the view model outlives it. */
+    fun refresh() {
         load()
         loadProfile()
     }

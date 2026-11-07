@@ -38,7 +38,7 @@ fun HomeScreen(
     onOpenWatchlist: () -> Unit,
     onOpenStats: () -> Unit,
     onOpenSettings: () -> Unit,
-    onOpenHistory: (String) -> Unit,
+    onOpenDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
 ) {
@@ -111,7 +111,7 @@ fun HomeScreen(
                             item = item,
                             isFavourite = item.company.symbol in state.watchlist,
                             onToggleFavourite = { viewModel.toggleWatchlist(item.company.symbol) },
-                            onClick = { onOpenHistory(item.company.symbol) },
+                            onClick = { onOpenDetail(item.company.symbol) },
                         )
                         HorizontalDivider()
                     }
