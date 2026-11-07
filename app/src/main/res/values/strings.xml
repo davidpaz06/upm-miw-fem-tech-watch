@@ -9,6 +9,8 @@
     <string name="auth_go_to_register">¿No tienes cuenta? Regístrate</string>
     <string name="auth_go_to_login">¿Ya tienes cuenta? Inicia sesión</string>
     <string name="auth_logout">Cerrar sesión</string>
+    <string name="theme_switch_to_dark">Cambiar a modo oscuro</string>
+    <string name="theme_switch_to_light">Cambiar a modo claro</string>
 
     <string name="sector_cloud">Cloud</string>
     <string name="sector_ai">IA</string>

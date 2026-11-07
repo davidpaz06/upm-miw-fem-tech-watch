@@ -32,6 +32,7 @@ import com.example.project_auth.R
 import com.example.project_auth.data.AuthRepository
 import com.example.project_auth.domain.Sector
 import com.example.project_auth.ui.common.StaleDataBanner
+import com.example.project_auth.ui.theme.ThemeToggle
 
 @Composable
 fun HomeScreen(
@@ -60,6 +61,7 @@ fun HomeScreen(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
             )
+            ThemeToggle()
             TextButton(onClick = authRepository::signOut) {
                 Text(stringResource(R.string.auth_logout))
             }
