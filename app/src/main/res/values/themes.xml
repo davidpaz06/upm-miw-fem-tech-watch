@@ -2,7 +2,7 @@
 <resources>
 
     <style name="Theme.Projectauth" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:colorPrimary">@color/purple_500</item>
+        <item name="android:colorPrimary">@color/orange_500</item>
         <item name="android:colorAccent">@color/teal_200</item>
     </style>
 </resources>

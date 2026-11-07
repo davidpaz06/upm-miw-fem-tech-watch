@@ -16,26 +16,26 @@ private const val THEME_TRANSITION_MILLIS = 400
 
 /**
  * Built from res/values/colors.xml, so that file is the one place the palette is defined:
- * purple for primary and the pills, amber and orange for the warning banner and accents.
+ * orange for primary and the pills, amber for the warning banner and accents.
  */
 @Composable
 private fun appColorScheme(darkTheme: Boolean): ColorScheme {
-    val purple200 = colorResource(R.color.purple_200)
-    val purple500 = colorResource(R.color.purple_500)
-    val purple700 = colorResource(R.color.purple_700)
+    val orange200 = colorResource(R.color.orange_200)
+    val orange500 = colorResource(R.color.orange_500)
+    val orange700 = colorResource(R.color.orange_700)
     val amber = colorResource(R.color.teal_200)
     val orange = colorResource(R.color.teal_700)
     val black = colorResource(R.color.black)
     val white = colorResource(R.color.white)
     return if (darkTheme) {
         darkColorScheme(
-            primary = purple200,
+            primary = orange200,
             onPrimary = black,
-            primaryContainer = purple700,
+            primaryContainer = orange700,
             onPrimaryContainer = white,
             secondary = amber,
             onSecondary = black,
-            secondaryContainer = purple700,
+            secondaryContainer = orange700,
             onSecondaryContainer = white,
             tertiary = amber,
             onTertiary = black,
@@ -46,13 +46,13 @@ private fun appColorScheme(darkTheme: Boolean): ColorScheme {
         )
     } else {
         lightColorScheme(
-            primary = purple500,
+            primary = orange500,
             onPrimary = white,
-            primaryContainer = purple200,
+            primaryContainer = orange200,
             onPrimaryContainer = black,
             secondary = orange,
             onSecondary = black,
-            secondaryContainer = purple200,
+            secondaryContainer = orange200,
             onSecondaryContainer = black,
             tertiary = amber,
             onTertiary = black,
